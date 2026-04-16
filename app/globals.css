@@ -270,3 +270,23 @@
   background: linear-gradient(135deg, rgba(6, 182, 212, 0.15), rgba(124, 58, 237, 0.15));
   border: 1px solid rgba(6, 182, 212, 0.2);
 }
+
+/* ── Founder card ── */
+.founder-card {
+  @apply bg-zinc-900/90 border border-zinc-800/80 rounded-2xl p-6;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.03) inset;
+  transition: box-shadow 300ms ease, border-color 300ms ease, transform 300ms ease, background 300ms ease;
+}
+.founder-card:hover {
+  @apply border-cyan-500/30;
+  box-shadow: 0 12px 40px rgba(6, 182, 212, 0.12), 0 0 0 1px rgba(6, 182, 212, 0.15) inset;
+  transform: translateY(-3px);
+  background: linear-gradient(160deg, rgba(6, 182, 212, 0.05) 0%, rgba(124, 58, 237, 0.05) 100%);
+}
+
+/* ── Cyber section inside founder card ── */
+.cyber-section {
+  @apply p-3.5 rounded-xl;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.04);
+}

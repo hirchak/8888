@@ -62,6 +62,13 @@ export function NavLinks() {
         <span className="hidden sm:inline">Дашборд</span>
       </Link>
       <Link
+        href="/founders"
+        className={`nav-link ${pathname === '/founders' ? 'nav-link-active' : 'nav-link-inactive'}`}
+      >
+        <span className="text-base">⚡</span>
+        <span className="hidden lg:inline">Фаундери</span>
+      </Link>
+      <Link
         href="/add"
         className={`nav-link ${pathname === '/add' ? 'nav-link-active' : 'nav-link-inactive'}`}
       >
