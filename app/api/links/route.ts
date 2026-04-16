@@ -1,35 +1,31 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getDb } from '@/lib/db';
+import { addLink, removeLink } from '@/lib/store';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const LINK_TABLES: Record<string, any> = {
-  'person_project': ['person_project_links', 'person_id', 'project_id'],
-  'project_person': ['person_project_links', 'project_id', 'person_id'],
-  'person_idea': ['person_idea_links', 'person_id', 'idea_id'],
-  'idea_person': ['person_idea_links', 'idea_id', 'person_id'],
-  'idea_opportunity': ['idea_opportunity_links', 'idea_id', 'opportunity_id'],
-  'opportunity_idea': ['idea_opportunity_links', 'opportunity_id', 'idea_id'],
-  'project_opportunity': ['project_opportunity_links', 'project_id', 'opportunity_id'],
-  'opportunity_project': ['project_opportunity_links', 'opportunity_id', 'project_id'],
+const LINK_PAIRS: Record<string, [string, string]> = {
+  'person_project': ['person', 'project'],
+  'project_person': ['project', 'person'],
+  'person_idea': ['person', 'idea'],
+  'idea_person': ['idea', 'person'],
+  'idea_opportunity': ['idea', 'opportunity'],
+  'opportunity_idea': ['opportunity', 'idea'],
+  'project_opportunity': ['project', 'opportunity'],
+  'opportunity_project': ['opportunity', 'project'],
 };
 
 export async function POST(req: NextRequest) {
   try {
     const data = await req.json();
     const key = `${data.source_type}_${data.target_type}`;
-    const linkDef = LINK_TABLES[key];
+    const pair = LINK_PAIRS[key];
 
-    if (!linkDef) {
-      return NextResponse.json({ detail: `Unsupported link: ${data.source_type} -> ${data.target_type}` }, { status: 400 });
+    if (!pair) {
+      return NextResponse.json(
+        { detail: `Unsupported link: ${data.source_type} -> ${data.target_type}` },
+        { status: 400 }
+      );
     }
 
-    const db = getDb();
-    const [table, colA, colB] = linkDef;
-
-    await db.execute({
-      sql: `INSERT OR IGNORE INTO ${table} (${colA}, ${colB}) VALUES (?, ?)`,
-      args: [data.source_id, data.target_id],
-    });
+    addLink(pair[0], data.source_id, pair[1], data.target_id);
     return NextResponse.json({ ok: true }, { status: 201 });
   } catch (e: any) {
     return NextResponse.json({ detail: e.message }, { status: 500 });
@@ -40,19 +36,16 @@ export async function DELETE(req: NextRequest) {
   try {
     const data = await req.json();
     const key = `${data.source_type}_${data.target_type}`;
-    const linkDef = LINK_TABLES[key];
+    const pair = LINK_PAIRS[key];
 
-    if (!linkDef) {
-      return NextResponse.json({ detail: `Unsupported link: ${data.source_type} -> ${data.target_type}` }, { status: 400 });
+    if (!pair) {
+      return NextResponse.json(
+        { detail: `Unsupported link: ${data.source_type} -> ${data.target_type}` },
+        { status: 400 }
+      );
     }
 
-    const db = getDb();
-    const [table, colA, colB] = linkDef;
-
-    await db.execute({
-      sql: `DELETE FROM ${table} WHERE ${colA} = ? AND ${colB} = ?`,
-      args: [data.source_id, data.target_id],
-    });
+    removeLink(pair[0], data.source_id, pair[1], data.target_id);
     return NextResponse.json({ ok: true });
   } catch (e: any) {
     return NextResponse.json({ detail: e.message }, { status: 500 });

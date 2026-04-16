@@ -1,22 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getDb } from '@/lib/db';
+import { db, generateId } from '@/lib/store';
 
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
     const search = searchParams.get('search');
-    const db = getDb();
 
-    let rows;
+    let rows = db.opportunities;
     if (search) {
-      const result = await db.execute({
-        sql: "SELECT * FROM opportunities WHERE name LIKE ? OR description LIKE ? OR category LIKE ? ORDER BY updated_at DESC",
-        args: [`%${search}%`, `%${search}%`, `%${search}%`],
-      });
-      rows = result.rows;
-    } else {
-      const result = await db.execute("SELECT * FROM opportunities ORDER BY updated_at DESC");
-      rows = result.rows;
+      const q = search.toLowerCase();
+      rows = rows.filter(
+        (o: any) =>
+          o.name.toLowerCase().includes(q) ||
+          (o.description || '').toLowerCase().includes(q) ||
+          (o.category || '').toLowerCase().includes(q)
+      );
     }
 
     return NextResponse.json(rows);
@@ -28,29 +26,22 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const data = await req.json();
-    const db = getDb();
     const now = new Date().toISOString();
 
-    const info = await db.execute({
-      sql: `INSERT INTO opportunities (name, description, category, source_type, source_person_id, source_project_id, created_at, updated_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-      args: [
-        data.name,
-        data.description || '',
-        data.category || '',
-        data.source_type || 'external',
-        data.source_person_id ?? null,
-        data.source_project_id ?? null,
-        now,
-        now,
-      ],
-    });
+    const newItem: any = {
+      id: generateId('opportunities'),
+      name: data.name,
+      description: data.description || '',
+      category: data.category || '',
+      source_type: data.source_type || 'external',
+      source_person_id: data.source_person_id ?? null,
+      source_project_id: data.source_project_id ?? null,
+      created_at: now,
+      updated_at: now,
+    };
 
-    const rowResult = await db.execute({
-      sql: "SELECT * FROM opportunities WHERE id = ?",
-      args: [info.lastInsertRowid],
-    });
-    return NextResponse.json(rowResult.rows[0], { status: 201 });
+    db.opportunities.push(newItem);
+    return NextResponse.json(newItem, { status: 201 });
   } catch (e: any) {
     return NextResponse.json({ detail: e.message }, { status: 500 });
   }

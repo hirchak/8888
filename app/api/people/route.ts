@@ -1,32 +1,28 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getDb, getLinkedProjects, getLinkedIdeas } from '@/lib/db';
+import { db, generateId, getLinkedIds } from '@/lib/store';
 
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
     const search = searchParams.get('search');
-    const db = getDb();
 
-    let rows;
+    let people = db.people;
     if (search) {
-      const result = await db.execute({
-        sql: "SELECT * FROM people WHERE name LIKE ? OR expertise LIKE ? OR role LIKE ? ORDER BY updated_at DESC",
-        args: [`%${search}%`, `%${search}%`, `%${search}%`],
-      });
-      rows = result.rows;
-    } else {
-      const result = await db.execute("SELECT * FROM people ORDER BY updated_at DESC");
-      rows = result.rows;
+      const q = search.toLowerCase();
+      people = people.filter(
+        (p: any) =>
+          p.name.toLowerCase().includes(q) ||
+          (p.expertise || '').toLowerCase().includes(q) ||
+          (p.role || '').toLowerCase().includes(q)
+      );
     }
 
-    const result = await Promise.all(
-      (rows as any[]).map(async (row: any) => {
-        const person = { ...row };
-        person.projects = await getLinkedProjects(db, person.id);
-        person.ideas = await getLinkedIdeas(db, person.id);
-        return person;
-      })
-    );
+    const result = people.map((person: any) => {
+      const p = { ...person };
+      p.projects = getLinkedIds('person', p.id, 'project').map((id) => ({ id })).filter(Boolean);
+      p.ideas = getLinkedIds('person', p.id, 'idea').map((id) => ({ id })).filter(Boolean);
+      return p;
+    });
 
     return NextResponse.json(result);
   } catch (e: any) {
@@ -37,33 +33,25 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const data = await req.json();
-    const db = getDb();
     const now = new Date().toISOString();
 
-    const info = await db.execute({
-      sql: `INSERT INTO people (name, role, expertise, company, contact, summary, interests, created_at, updated_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      args: [
-        data.name,
-        data.role || '',
-        data.expertise || '',
-        data.company || '',
-        data.contact || '',
-        data.summary || '',
-        data.interests || '',
-        now,
-        now,
-      ],
-    });
+    const newItem: any = {
+      id: generateId('people'),
+      name: data.name,
+      role: data.role || '',
+      expertise: data.expertise || '',
+      company: data.company || '',
+      contact: data.contact || '',
+      summary: data.summary || '',
+      interests: data.interests || '',
+      created_at: now,
+      updated_at: now,
+    };
 
-    const rowResult = await db.execute({
-      sql: "SELECT * FROM people WHERE id = ?",
-      args: [info.lastInsertRowid],
-    });
-    const row = rowResult.rows[0] as any;
-    const person = { ...row };
-    person.projects = await getLinkedProjects(db, person.id);
-    person.ideas = await getLinkedIdeas(db, person.id);
+    db.people.push(newItem);
+    const person = { ...newItem };
+    person.projects = [];
+    person.ideas = [];
     return NextResponse.json(person, { status: 201 });
   } catch (e: any) {
     return NextResponse.json({ detail: e.message }, { status: 500 });

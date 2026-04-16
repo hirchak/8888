@@ -1,32 +1,31 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getDb, getLinkedPeople, getLinkedOpportunities } from '@/lib/db';
+import { db, generateId, getLinkedIds } from '@/lib/store';
 
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
     const search = searchParams.get('search');
-    const db = getDb();
 
-    let rows;
+    let projects = db.projects;
     if (search) {
-      const result = await db.execute({
-        sql: "SELECT * FROM projects WHERE name LIKE ? OR description LIKE ? ORDER BY updated_at DESC",
-        args: [`%${search}%`, `%${search}%`],
-      });
-      rows = result.rows;
-    } else {
-      const result = await db.execute("SELECT * FROM projects ORDER BY updated_at DESC");
-      rows = result.rows;
+      const q = search.toLowerCase();
+      projects = projects.filter(
+        (p: any) =>
+          p.name.toLowerCase().includes(q) ||
+          (p.description || '').toLowerCase().includes(q)
+      );
     }
 
-    const result = await Promise.all(
-      (rows as any[]).map(async (row: any) => {
-        const proj = { ...row };
-        proj.people = await getLinkedPeople(db, proj.id);
-        proj.opportunities = await getLinkedOpportunities(db, 'project', proj.id);
-        return proj;
-      })
-    );
+    const result = projects.map((proj: any) => {
+      const p = { ...proj };
+      p.people = getLinkedIds('project', p.id, 'person')
+        .map((pid: number) => db.people.find((x: any) => x.id === pid))
+        .filter(Boolean);
+      p.opportunities = getLinkedIds('project', p.id, 'opportunity')
+        .map((oid: number) => db.opportunities.find((x: any) => x.id === oid))
+        .filter(Boolean);
+      return p;
+    });
 
     return NextResponse.json(result);
   } catch (e: any) {
@@ -37,32 +36,22 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const data = await req.json();
-    const db = getDb();
     const now = new Date().toISOString();
 
-    const info = await db.execute({
-      sql: `INSERT INTO projects (name, description, goal, stage, bottleneck, founder_id, created_at, updated_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-      args: [
-        data.name,
-        data.description || '',
-        data.goal || '',
-        data.stage || 'Planning',
-        data.bottleneck || '',
-        data.founder_id ?? null,
-        now,
-        now,
-      ],
-    });
+    const newItem: any = {
+      id: generateId('projects'),
+      name: data.name,
+      description: data.description || '',
+      goal: data.goal || '',
+      stage: data.stage || 'Planning',
+      bottleneck: data.bottleneck || '',
+      founder_id: data.founder_id ?? null,
+      created_at: now,
+      updated_at: now,
+    };
 
-    const rowResult = await db.execute({
-      sql: "SELECT * FROM projects WHERE id = ?",
-      args: [info.lastInsertRowid],
-    });
-    const row = rowResult.rows[0] as any;
-    const proj = { ...row };
-    proj.people = await getLinkedPeople(db, proj.id);
-    proj.opportunities = await getLinkedOpportunities(db, 'project', proj.id);
+    db.projects.push(newItem);
+    const proj = { ...newItem, people: [], opportunities: [] };
     return NextResponse.json(proj, { status: 201 });
   } catch (e: any) {
     return NextResponse.json({ detail: e.message }, { status: 500 });

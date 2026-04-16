@@ -1,18 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getDb, getLinkedProjects, getLinkedIdeas } from '@/lib/db';
+import { db, generateId, getLinkedIds, addLink, removeLinksByEntity } from '@/lib/store';
 
 export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
   try {
-    const db = getDb();
     const id = Number(params.id);
-    const rowResult = await db.execute({ sql: "SELECT * FROM people WHERE id = ?", args: [id] });
-    const row = rowResult.rows[0] as any;
-    if (!row) return NextResponse.json({ detail: 'Person not found' }, { status: 404 });
+    const person = db.people.find((p: any) => p.id === id);
+    if (!person) return NextResponse.json({ detail: 'Person not found' }, { status: 404 });
 
-    const person = { ...row };
-    person.projects = await getLinkedProjects(db, id);
-    person.ideas = await getLinkedIdeas(db, id);
-    return NextResponse.json(person);
+    const result = { ...person };
+    result.projects = getLinkedIds('person', id, 'project')
+      .map((pid: number) => db.projects.find((p: any) => p.id === pid))
+      .filter(Boolean);
+    result.ideas = getLinkedIds('person', id, 'idea')
+      .map((iid: number) => db.ideas.find((i: any) => i.id === iid))
+      .filter(Boolean);
+    return NextResponse.json(result);
   } catch (e: any) {
     return NextResponse.json({ detail: e.message }, { status: 500 });
   }
@@ -21,33 +23,25 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
 export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
   try {
     const data = await req.json();
-    const db = getDb();
     const id = Number(params.id);
+    const idx = db.people.findIndex((p: any) => p.id === id);
+    if (idx === -1) return NextResponse.json({ detail: 'Person not found' }, { status: 404 });
 
-    const existingResult = await db.execute({ sql: "SELECT id FROM people WHERE id = ?", args: [id] });
-    if (existingResult.rows.length === 0) return NextResponse.json({ detail: 'Person not found' }, { status: 404 });
-
-    const fields: string[] = [];
-    const vals: (string | number)[] = [];
+    const person = db.people[idx];
+    const now = new Date().toISOString();
     for (const key of ['name', 'role', 'expertise', 'company', 'contact', 'summary', 'interests']) {
-      if (data[key] !== undefined) {
-        fields.push(`${key} = ?`);
-        vals.push(data[key]);
-      }
+      if (data[key] !== undefined) (person as any)[key] = data[key];
     }
-    if (fields.length > 0) {
-      fields.push('updated_at = ?');
-      vals.push(new Date().toISOString());
-      vals.push(id);
-      await db.execute({ sql: `UPDATE people SET ${fields.join(', ')} WHERE id = ?`, args: vals });
-    }
+    person.updated_at = now;
 
-    const rowResult = await db.execute({ sql: "SELECT * FROM people WHERE id = ?", args: [id] });
-    const row = rowResult.rows[0] as any;
-    const person = { ...row };
-    person.projects = await getLinkedProjects(db, id);
-    person.ideas = await getLinkedIdeas(db, id);
-    return NextResponse.json(person);
+    const result = { ...person };
+    result.projects = getLinkedIds('person', id, 'project')
+      .map((pid: number) => db.projects.find((p: any) => p.id === pid))
+      .filter(Boolean);
+    result.ideas = getLinkedIds('person', id, 'idea')
+      .map((iid: number) => db.ideas.find((i: any) => i.id === iid))
+      .filter(Boolean);
+    return NextResponse.json(result);
   } catch (e: any) {
     return NextResponse.json({ detail: e.message }, { status: 500 });
   }
@@ -55,15 +49,12 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
 
 export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
   try {
-    const db = getDb();
     const id = Number(params.id);
+    const idx = db.people.findIndex((p: any) => p.id === id);
+    if (idx === -1) return NextResponse.json({ detail: 'Person not found' }, { status: 404 });
 
-    const existingResult = await db.execute({ sql: "SELECT id FROM people WHERE id = ?", args: [id] });
-    if (existingResult.rows.length === 0) return NextResponse.json({ detail: 'Person not found' }, { status: 404 });
-
-    await db.execute({ sql: "DELETE FROM person_project_links WHERE person_id = ?", args: [id] });
-    await db.execute({ sql: "DELETE FROM person_idea_links WHERE person_id = ?", args: [id] });
-    await db.execute({ sql: "DELETE FROM people WHERE id = ?", args: [id] });
+    removeLinksByEntity('person', id);
+    db.people.splice(idx, 1);
     return NextResponse.json({ ok: true });
   } catch (e: any) {
     return NextResponse.json({ detail: e.message }, { status: 500 });
