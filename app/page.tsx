@@ -52,7 +52,7 @@ function formatShortDate(dateStr) {
 }
 
 function EntityCard({ href, name, sub, tags, stageLabel, stageColor, createdAt, linkCount }) {
-  const totalLinks = linkCount ? Object.values(linkCount).reduce((a, b) => a + b, 0) : 0;
+  const totalLinks = linkCount ? Object.values(linkCount as Record<string,number>).reduce((a:number, b:number) => a + b, 0) : 0;
   const linkLabel = linkCount
     ? [
         linkCount.projects ? `${linkCount.projects} проєкт${linkCount.projects === 1 ? '' : 'и'}` : '',
