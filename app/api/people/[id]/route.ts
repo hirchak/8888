@@ -29,7 +29,7 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
 
     const person = db.people[idx];
     const now = new Date().toISOString();
-    for (const key of ['name', 'role', 'expertise', 'company', 'contact', 'summary', 'interests']) {
+    for (const key of ['name', 'role', 'expertise', 'company', 'contact', 'summary', 'interests', 'tags']) {
       if (data[key] !== undefined) (person as any)[key] = data[key];
     }
     person.updated_at = now;

@@ -28,7 +28,7 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
     if (idx === -1) return NextResponse.json({ detail: 'Idea not found' }, { status: 404 });
 
     const idea = db.ideas[idx];
-    for (const key of ['name', 'pitch', 'roi', 'origin', 'author', 'requirements', 'matched_assets', 'status']) {
+    for (const key of ['name', 'pitch', 'roi', 'origin', 'author', 'requirements', 'matched_assets', 'status', 'tags']) {
       if (data[key] !== undefined) (idea as any)[key] = data[key];
     }
     idea.updated_at = new Date().toISOString();

@@ -45,19 +45,50 @@ function StatCard({ href, icon, label, count, accent, delay = 0 }) {
 }
 
 // ── Entity Card ─────────────────────────────────────────────
-function EntityCard({ href, name, sub, tags, stageLabel, stageColor }) {
+function formatShortDate(dateStr) {
+  if (!dateStr) return '';
+  const d = new Date(dateStr);
+  return d.toLocaleDateString('uk-UA', { day: '2-digit', month: '2-digit', year: '2-digit' });
+}
+
+function EntityCard({ href, name, sub, tags, stageLabel, stageColor, createdAt, linkCount }) {
+  const totalLinks = linkCount ? Object.values(linkCount).reduce((a, b) => a + b, 0) : 0;
+  const linkLabel = linkCount
+    ? [
+        linkCount.projects ? `${linkCount.projects} проєкт${linkCount.projects === 1 ? '' : 'и'}` : '',
+        linkCount.ideas ? `${linkCount.ideas} іде${linkCount.ideas === 1 ? 'я' : 'ї'}` : '',
+        linkCount.people ? `${linkCount.people} люд${linkCount.people === 1 ? 'ина' : 'ей'}` : '',
+        linkCount.opportunities ? `${linkCount.opportunities} можл${linkCount.opportunities === 1 ? 'івсть' : 'ивостей'}` : '',
+      ].filter(Boolean).join(', ')
+    : '';
+
   return (
-    <Link href={href} className="cyber-card group block">
-      <div className="flex items-start justify-between gap-2 mb-2">
+    <Link href={href} className="cyber-card group block relative">
+      {/* Edit button (top-right corner) */}
+      <Link
+        href={href}
+        onClick={e => e.stopPropagation()}
+        className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200 btn-secondary text-xs py-1 px-2 rounded-lg"
+      >
+        ✏️
+      </Link>
+
+      <div className="flex items-start justify-between gap-2 mb-2 pr-8">
         <div className="font-semibold text-zinc-100 truncate group-hover:text-white transition-colors duration-200">{name}</div>
         {stageLabel && <span className={`tag shrink-0 text-xs ${stageColor}`}>{stageLabel}</span>}
       </div>
       <div className="text-sm text-zinc-500 truncate mb-3">{sub || '—'}</div>
       {tags && tags.length > 0 && (
-        <div className="flex flex-wrap gap-1.5">
+        <div className="flex flex-wrap gap-1.5 mb-2">
           {tags.map((t, i) => <span key={i} className="tag bg-zinc-800 text-zinc-400 text-xs border border-zinc-700/50">{t}</span>)}
         </div>
       )}
+      {/* Metadata footer */}
+      <div className="flex items-center justify-between text-xs text-zinc-600 mt-2 pt-2 border-t border-zinc-800/60">
+        {createdAt && <span>{formatShortDate(createdAt)}</span>}
+        {totalLinks > 0 && <span className="text-cyan-500/70">{linkLabel}</span>}
+        {!createdAt && !totalLinks && <span />}
+      </div>
     </Link>
   );
 }
@@ -250,6 +281,8 @@ function DashboardInner() {
               sub: p.role || p.expertise || '—',
               tags: p.tags ? p.tags.split(',').map(t => t.trim()).filter(Boolean).slice(0, 3) : (p.expertise ? p.expertise.split(',').map(t => t.trim()).filter(Boolean).slice(0, 2) : []),
               href: `/people/${p.id}`,
+              createdAt: p.created_at,
+              linkCount: { projects: p.projects?.length ?? 0, ideas: p.ideas?.length ?? 0 },
             }))}
             emptyHref="/add?type=person"
             emptyLabel="Додати першу людину"
@@ -270,6 +303,8 @@ function DashboardInner() {
                 stageColor: stageInfo.color,
                 tags: p.tags ? p.tags.split(',').map(t => t.trim()).filter(Boolean).slice(0, 3) : (p.people?.slice(0, 2).map(person => person.name) || []),
                 href: `/projects/${p.id}`,
+                createdAt: p.created_at,
+                linkCount: { people: p.people?.length ?? 0, opportunities: p.opportunities?.length ?? 0 },
               };
             })}
             emptyHref="/add?type=project"
@@ -291,6 +326,8 @@ function DashboardInner() {
                 stageColor: stageInfo.color,
                 tags: i.tags ? i.tags.split(',').map(t => t.trim()).filter(Boolean).slice(0, 3) : [],
                 href: `/ideas/${i.id}`,
+                createdAt: i.created_at,
+                linkCount: { people: i.people?.length ?? 0, opportunities: i.opportunities?.length ?? 0 },
               };
             })}
             emptyHref="/add?type=idea"
@@ -308,6 +345,8 @@ function DashboardInner() {
               sub: o.description || '—',
               tags: o.tags ? o.tags.split(',').map(t => t.trim()).filter(Boolean).slice(0, 3) : (o.category ? [o.category] : []),
               href: `/opportunities/${o.id}`,
+              createdAt: o.created_at,
+              linkCount: {},
             }))}
             emptyHref="/add?type=opportunity"
             emptyLabel="Додати першу можливість"
@@ -325,6 +364,8 @@ function DashboardInner() {
               id: p.id, name: p.name, sub: p.role || p.expertise || '—',
               tags: p.tags ? p.tags.split(',').map(t => t.trim()).filter(Boolean).slice(0, 3) : (p.expertise ? p.expertise.split(',').map(t => t.trim()).filter(Boolean).slice(0, 2) : []),
               href: `/people/${p.id}`,
+              createdAt: p.created_at,
+              linkCount: { projects: p.projects?.length ?? 0, ideas: p.ideas?.length ?? 0 },
             }))} emptyHref="" emptyLabel="" addHref="" addLabel="" />
           )}
           {projects.length > 0 && (
@@ -333,6 +374,8 @@ function DashboardInner() {
               stageLabel: PROJECT_STAGES[p.stage]?.label || p.stage,
               stageColor: PROJECT_STAGES[p.stage]?.color || 'bg-zinc-700',
               href: `/projects/${p.id}`,
+              createdAt: p.created_at,
+              linkCount: { people: p.people?.length ?? 0, opportunities: p.opportunities?.length ?? 0 },
             }))} emptyHref="" emptyLabel="" addHref="" addLabel="" />
           )}
           {ideas.length > 0 && (
@@ -341,6 +384,8 @@ function DashboardInner() {
               stageLabel: IDEA_STAGES[i.status]?.label || i.status,
               stageColor: IDEA_STAGES[i.status]?.color || 'bg-zinc-700',
               href: `/ideas/${i.id}`,
+              createdAt: i.created_at,
+              linkCount: { people: i.people?.length ?? 0, opportunities: i.opportunities?.length ?? 0 },
             }))} emptyHref="" emptyLabel="" addHref="" addLabel="" />
           )}
           {opportunities.length > 0 && (
@@ -348,6 +393,8 @@ function DashboardInner() {
               id: o.id, name: o.name, sub: o.category || '—',
               tags: o.tags ? o.tags.split(',').map(t => t.trim()).filter(Boolean).slice(0, 3) : (o.category ? [o.category] : []),
               href: `/opportunities/${o.id}`,
+              createdAt: o.created_at,
+              linkCount: {},
             }))} emptyHref="" emptyLabel="" addHref="" addLabel="" />
           )}
         </>
