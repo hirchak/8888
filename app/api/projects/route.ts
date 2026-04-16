@@ -5,6 +5,7 @@ export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
     const search = searchParams.get('search');
+    const tagsParam = searchParams.get('tags');
 
     let projects = db.projects;
     if (search) {
@@ -12,8 +13,16 @@ export async function GET(req: NextRequest) {
       projects = projects.filter(
         (p: any) =>
           p.name.toLowerCase().includes(q) ||
-          (p.description || '').toLowerCase().includes(q)
+          (p.description || '').toLowerCase().includes(q) ||
+          (p.tags || '').toLowerCase().includes(q)
       );
+    }
+    if (tagsParam) {
+      const filterTags = tagsParam.split(',').map(t => t.trim().toLowerCase());
+      projects = projects.filter((p: any) => {
+        const entityTags = (p.tags || '').split(',').map(t => t.trim().toLowerCase()).filter(Boolean);
+        return filterTags.some(ft => entityTags.includes(ft));
+      });
     }
 
     const result = projects.map((proj: any) => {
@@ -46,6 +55,7 @@ export async function POST(req: NextRequest) {
       stage: data.stage || 'Planning',
       bottleneck: data.bottleneck || '',
       founder_id: data.founder_id ?? null,
+      tags: data.tags || '',
       created_at: now,
       updated_at: now,
     };

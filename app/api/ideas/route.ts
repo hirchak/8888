@@ -5,6 +5,7 @@ export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
     const search = searchParams.get('search');
+    const tagsParam = searchParams.get('tags');
 
     let ideas = db.ideas;
     if (search) {
@@ -12,8 +13,16 @@ export async function GET(req: NextRequest) {
       ideas = ideas.filter(
         (i: any) =>
           i.name.toLowerCase().includes(q) ||
-          (i.pitch || '').toLowerCase().includes(q)
+          (i.pitch || '').toLowerCase().includes(q) ||
+          (i.tags || '').toLowerCase().includes(q)
       );
+    }
+    if (tagsParam) {
+      const filterTags = tagsParam.split(',').map(t => t.trim().toLowerCase());
+      ideas = ideas.filter((i: any) => {
+        const entityTags = (i.tags || '').split(',').map(t => t.trim().toLowerCase()).filter(Boolean);
+        return filterTags.some(ft => entityTags.includes(ft));
+      });
     }
 
     const result = ideas.map((idea: any) => {
@@ -48,6 +57,7 @@ export async function POST(req: NextRequest) {
       requirements: data.requirements || '',
       matched_assets: data.matched_assets || '',
       status: data.status || 'Hypothesis',
+      tags: data.tags || '',
       created_at: now,
       updated_at: now,
     };

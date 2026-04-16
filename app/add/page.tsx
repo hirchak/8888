@@ -38,10 +38,10 @@ function AddForm() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
 
-  const [person, setPerson] = useState({ name: '', role: '', expertise: '', company: '', contact: '', summary: '', interests: '' });
-  const [project, setProject] = useState({ name: '', description: '', goal: '', stage: 'Planning', bottleneck: '' });
-  const [idea, setIdea] = useState({ name: '', pitch: '', roi: '', origin: '', author: '', requirements: '', matched_assets: '', status: 'Hypothesis' });
-  const [opp, setOpp] = useState({ name: '', description: '', category: '', source_type: 'external' });
+  const [person, setPerson] = useState({ name: '', role: '', expertise: '', company: '', contact: '', summary: '', interests: '', tags: '' });
+  const [project, setProject] = useState({ name: '', description: '', goal: '', stage: 'Planning', bottleneck: '', tags: '' });
+  const [idea, setIdea] = useState({ name: '', pitch: '', roi: '', origin: '', author: '', requirements: '', matched_assets: '', status: 'Hypothesis', tags: '' });
+  const [opp, setOpp] = useState({ name: '', description: '', category: '', source_type: 'external', tags: '' });
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -117,6 +117,7 @@ function AddForm() {
               <Field label="Компанія" value={person.company} onChange={v => setPerson(p => ({ ...p, company: v }))} placeholder="TechCorp" />
               <Field label="Контакти" value={person.contact} onChange={v => setPerson(p => ({ ...p, contact: v }))} placeholder="email@t.com, @username" />
               <Field label="Інтереси" value={person.interests} onChange={v => setPerson(p => ({ ...p, interests: v }))} placeholder="AI, крипто, нерухомість" />
+              <Field label="Теги" value={person.tags} onChange={v => setPerson(p => ({ ...p, tags: v }))} placeholder="ukraine, fintech, ai (comma-separated)" />
               <Field label="Підсумок" value={person.summary} onChange={v => setPerson(p => ({ ...p, summary: v }))} type="textarea" placeholder="Короткий опис..." />
             </div>
           </>
@@ -136,6 +137,7 @@ function AddForm() {
                 </select>
               </div>
               <Field label="Вузьке місце" value={project.bottleneck} onChange={v => setProject(p => ({ ...p, bottleneck: v }))} type="textarea" placeholder="Що зараз гальмує..." />
+              <Field label="Теги" value={project.tags} onChange={v => setProject(p => ({ ...p, tags: v }))} placeholder="saas, b2b, ai (comma-separated)" />
             </div>
           </>
         )}
@@ -151,6 +153,7 @@ function AddForm() {
               <Field label="Автор / Ініціатор" value={idea.author} onChange={v => setIdea(i => ({ ...i, author: v }))} placeholder="Ім&apos;я автора" />
               <Field label="Що потрібно для старту" value={idea.requirements} onChange={v => setIdea(i => ({ ...i, requirements: v }))} type="textarea" placeholder="Яких ресурсів бракує..." />
               <Field label="Наявні ресурси" value={idea.matched_assets} onChange={v => setIdea(i => ({ ...i, matched_assets: v }))} type="textarea" placeholder="Що вже є..." />
+              <Field label="Теги" value={idea.tags} onChange={v => setIdea(i => ({ ...i, tags: v }))} placeholder="fintech, b2c, marketplace (comma-separated)" />
               <div>
                 <label className="label">Статус</label>
                 <select value={idea.status} onChange={e => setIdea(i => ({ ...i, status: e.target.value }))} className="input-field">
@@ -180,6 +183,7 @@ function AddForm() {
                   {SOURCE_TYPES.map(([val, label]) => <option key={val} value={val}>{label}</option>)}
                 </select>
               </div>
+              <Field label="Теги" value={opp.tags} onChange={v => setOpp(o => ({ ...o, tags: v }))} placeholder="aws, credits, cloud (comma-separated)" />
             </div>
           </>
         )}

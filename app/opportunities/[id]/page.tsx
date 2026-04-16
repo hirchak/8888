@@ -30,6 +30,7 @@ export default function OpportunityPage() {
         description: data.description,
         category: data.category,
         source_type: data.source_type,
+        tags: data.tags || '',
       });
     } catch (e) {
       setError(e.message);
@@ -120,6 +121,13 @@ export default function OpportunityPage() {
           ) : (
             <p className="text-zinc-200">{sourceLabel}</p>
           )}
+        </div>
+        <div>
+          <div className="label">Теги</div>
+          {editing
+            ? <input value={form.tags} onChange={e => setForm(f => ({ ...f, tags: e.target.value }))} className="input-field" placeholder="cloud, aws, credits" />
+            : <p className="text-zinc-200">{opp.tags || '—'}</p>
+          }
         </div>
       </div>
 

@@ -5,6 +5,7 @@ export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
     const search = searchParams.get('search');
+    const tagsParam = searchParams.get('tags');
 
     let people = db.people;
     if (search) {
@@ -13,8 +14,16 @@ export async function GET(req: NextRequest) {
         (p: any) =>
           p.name.toLowerCase().includes(q) ||
           (p.expertise || '').toLowerCase().includes(q) ||
-          (p.role || '').toLowerCase().includes(q)
+          (p.role || '').toLowerCase().includes(q) ||
+          (p.tags || '').toLowerCase().includes(q)
       );
+    }
+    if (tagsParam) {
+      const filterTags = tagsParam.split(',').map(t => t.trim().toLowerCase());
+      people = people.filter((p: any) => {
+        const entityTags = (p.tags || '').split(',').map(t => t.trim().toLowerCase()).filter(Boolean);
+        return filterTags.some(ft => entityTags.includes(ft));
+      });
     }
 
     const result = people.map((person: any) => {
@@ -44,6 +53,7 @@ export async function POST(req: NextRequest) {
       contact: data.contact || '',
       summary: data.summary || '',
       interests: data.interests || '',
+      tags: data.tags || '',
       created_at: now,
       updated_at: now,
     };

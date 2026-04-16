@@ -40,6 +40,7 @@ export default function PersonPage() {
         contact: data.contact,
         summary: data.summary,
         interests: data.interests,
+        tags: data.tags || '',
       });
     } catch (e) {
       setError(e.message);
@@ -136,6 +137,7 @@ export default function PersonPage() {
           { key: 'expertise', label: 'Експертиза' },
           { key: 'contact', label: 'Контакти' },
           { key: 'interests', label: 'Інтереси' },
+          { key: 'tags', label: 'Теги' },
         ].map(({ key, label }) => (
           <div key={key}>
             <div className="label">{label}</div>

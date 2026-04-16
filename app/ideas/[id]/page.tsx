@@ -44,6 +44,7 @@ export default function IdeaPage() {
         requirements: data.requirements,
         matched_assets: data.matched_assets,
         status: data.status,
+        tags: data.tags || '',
       });
     } catch (e) {
       setError(e.message);
@@ -154,6 +155,7 @@ export default function IdeaPage() {
         {[
           { key: 'requirements', label: 'Що потрібно для старту' },
           { key: 'matched_assets', label: 'Наявні ресурси' },
+          { key: 'tags', label: 'Теги' },
         ].map(({ key, label }) => (
           <div key={key}>
             <div className="label">{label}</div>

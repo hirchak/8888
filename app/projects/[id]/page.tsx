@@ -38,6 +38,7 @@ export default function ProjectPage() {
         goal: data.goal,
         stage: data.stage,
         bottleneck: data.bottleneck,
+        tags: data.tags || '',
       });
     } catch (e) {
       setError(e.message);
@@ -113,6 +114,7 @@ export default function ProjectPage() {
           { key: 'description', label: 'Опис' },
           { key: 'goal', label: 'Мета (KPI)' },
           { key: 'bottleneck', label: 'Вузьке місце / Наступний крок' },
+          { key: 'tags', label: 'Теги' },
         ].map(({ key, label }) => (
           <div key={key}>
             <div className="label">{label}</div>

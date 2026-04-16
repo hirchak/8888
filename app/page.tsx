@@ -244,7 +244,7 @@ function DashboardInner() {
               id: p.id,
               name: p.name,
               sub: p.role || p.expertise || '—',
-              tags: p.expertise ? p.expertise.split(',').map(t => t.trim()).filter(Boolean).slice(0, 2) : [],
+              tags: p.tags ? p.tags.split(',').map(t => t.trim()).filter(Boolean).slice(0, 3) : (p.expertise ? p.expertise.split(',').map(t => t.trim()).filter(Boolean).slice(0, 2) : []),
               href: `/people/${p.id}`,
             }))}
             emptyHref="/add?type=person"
@@ -264,7 +264,7 @@ function DashboardInner() {
                 sub: p.description || '—',
                 stageLabel: stageInfo.label,
                 stageColor: stageInfo.color,
-                tags: p.people?.slice(0, 2).map(person => person.name),
+                tags: p.tags ? p.tags.split(',').map(t => t.trim()).filter(Boolean).slice(0, 3) : (p.people?.slice(0, 2).map(person => person.name) || []),
                 href: `/projects/${p.id}`,
               };
             })}
@@ -285,6 +285,7 @@ function DashboardInner() {
                 sub: i.pitch || '—',
                 stageLabel: stageInfo.label,
                 stageColor: stageInfo.color,
+                tags: i.tags ? i.tags.split(',').map(t => t.trim()).filter(Boolean).slice(0, 3) : [],
                 href: `/ideas/${i.id}`,
               };
             })}
@@ -301,7 +302,7 @@ function DashboardInner() {
               id: o.id,
               name: o.name,
               sub: o.description || '—',
-              tags: o.category ? [o.category] : [],
+              tags: o.tags ? o.tags.split(',').map(t => t.trim()).filter(Boolean).slice(0, 3) : (o.category ? [o.category] : []),
               href: `/opportunities/${o.id}`,
             }))}
             emptyHref="/add?type=opportunity"
@@ -318,7 +319,7 @@ function DashboardInner() {
           {people.length > 0 && (
             <EntitySection title={`Люди (${people.length})`} icon="👤" items={people.map(p => ({
               id: p.id, name: p.name, sub: p.role || p.expertise || '—',
-              tags: p.expertise ? p.expertise.split(',').map(t => t.trim()).filter(Boolean).slice(0, 2) : [],
+              tags: p.tags ? p.tags.split(',').map(t => t.trim()).filter(Boolean).slice(0, 3) : (p.expertise ? p.expertise.split(',').map(t => t.trim()).filter(Boolean).slice(0, 2) : []),
               href: `/people/${p.id}`,
             }))} emptyHref="" emptyLabel="" addHref="" addLabel="" />
           )}
@@ -341,7 +342,7 @@ function DashboardInner() {
           {opportunities.length > 0 && (
             <EntitySection title={`Можливості (${opportunities.length})`} icon="🧩" items={opportunities.map(o => ({
               id: o.id, name: o.name, sub: o.category || '—',
-              tags: o.category ? [o.category] : [],
+              tags: o.tags ? o.tags.split(',').map(t => t.trim()).filter(Boolean).slice(0, 3) : (o.category ? [o.category] : []),
               href: `/opportunities/${o.id}`,
             }))} emptyHref="" emptyLabel="" addHref="" addLabel="" />
           )}
