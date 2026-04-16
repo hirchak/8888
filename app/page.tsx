@@ -6,76 +6,123 @@ import { useSearchParams } from 'next/navigation';
 import { api } from '@/lib/api';
 
 const IDEA_STAGES = {
-  'Hypothesis': { label: 'Гіпотеза', color: 'idea-hypothesis' },
-  'Research': { label: 'Дослідження', color: 'idea-research' },
-  'Resources': { label: 'Збираємо ресурси', color: 'idea-resources' },
-  'Ready': { label: 'Готова до запуску', color: 'idea-ready' },
-  'Launched': { label: 'Запущена', color: 'idea-launched' },
-  'Paused': { label: 'Відкладена', color: 'idea-paused' },
+  'Hypothesis': { label: 'Гіпотеза', color: 'bg-amber-900/50 text-amber-300 border border-amber-800/40' },
+  'Research': { label: 'Дослідження', color: 'bg-blue-900/50 text-blue-300 border border-blue-800/40' },
+  'Resources': { label: 'Збираємо ресурси', color: 'bg-cyan-900/50 text-cyan-300 border border-cyan-800/40' },
+  'Ready': { label: 'Готова до запуску', color: 'bg-emerald-900/50 text-emerald-300 border border-emerald-800/40' },
+  'Launched': { label: 'Запущена', color: 'bg-violet-900/50 text-violet-300 border border-violet-800/40' },
+  'Paused': { label: 'Відкладена', color: 'bg-red-900/50 text-red-300 border border-red-800/40' },
 };
 
 const PROJECT_STAGES = {
-  'Planning': { label: 'Планування', color: 'stage-planning' },
-  'MVP': { label: 'MVP', color: 'stage-mvp' },
-  'Beta': { label: 'Бета', color: 'stage-beta' },
-  'Active': { label: 'Активний', color: 'stage-active' },
-  'Paused': { label: 'На паузі', color: 'stage-paused' },
+  'Planning': { label: 'Планування', color: 'bg-zinc-700/70 text-zinc-300 border border-zinc-600/40' },
+  'MVP': { label: 'MVP', color: 'bg-blue-900/50 text-blue-300 border border-blue-800/40' },
+  'Beta': { label: 'Бета', color: 'bg-amber-900/50 text-amber-300 border border-amber-800/40' },
+  'Active': { label: 'Активний', color: 'bg-emerald-900/50 text-emerald-300 border border-emerald-800/40' },
+  'Paused': { label: 'На паузі', color: 'bg-red-900/50 text-red-300 border border-red-800/40' },
 };
 
-function EntityCard({ href, icon, label, count, accent }) {
+// ── Stat Card ──────────────────────────────────────────────
+function StatCard({ href, icon, label, count, accent, delay = 0 }) {
   return (
-    <Link href={href} className="card hover:border-zinc-600 transition-all duration-200 group">
-      <div className="flex items-center justify-between mb-3">
-        <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${accent}`}>
+    <Link
+      href={href}
+      className="cyber-card group relative overflow-hidden"
+      style={{ animationDelay: `${delay}ms` }}
+    >
+      {/* Glow orb */}
+      <div className={`absolute -top-4 -right-4 w-24 h-24 rounded-full blur-2xl opacity-0 group-hover:opacity-20 transition-opacity duration-500 ${accent}`} />
+      <div className="flex items-center justify-between mb-4 relative">
+        <div className={`w-11 h-11 rounded-xl flex items-center justify-center ${accent}`}>
           {icon}
         </div>
-        <span className="text-3xl font-bold text-zinc-100 group-hover:text-white transition-colors">{count ?? '—'}</span>
+        <span className="text-4xl font-bold text-zinc-100 group-hover:text-white transition-colors duration-200">{count ?? '—'}</span>
       </div>
-      <div className="text-sm font-medium text-zinc-400 group-hover:text-zinc-200 transition-colors">{label}</div>
+      <div className="text-sm font-medium text-zinc-400 group-hover:text-zinc-200 transition-colors duration-200 tracking-wide">{label}</div>
     </Link>
   );
 }
 
-function PersonIcon() {
-  return <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="10" cy="6" r="3.5"/><path d="M3 17c0-3.866 3.134-7 7-7s7 3.134 7 7"/></svg>;
-}
-function ProjectIcon() {
-  return <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="2" y="3" width="16" height="14" rx="2"/><path d="M2 7h16M7 3v4"/></svg>;
-}
-function IdeaIcon() {
-  return <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M10 2v3M10 15v3M2 10h3M15 10h3"/><circle cx="10" cy="10" r="4"/></svg>;
-}
-function OpportunityIcon() {
-  return <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M10 2L12.5 7.5H18L13.5 11L15.5 17L10 13.5L4.5 17L6.5 11L2 7.5H7.5L10 2Z"/></svg>;
+// ── Entity Card ─────────────────────────────────────────────
+function EntityCard({ href, name, sub, tags, stageLabel, stageColor }) {
+  return (
+    <Link href={href} className="cyber-card group block">
+      <div className="flex items-start justify-between gap-2 mb-2">
+        <div className="font-semibold text-zinc-100 truncate group-hover:text-white transition-colors duration-200">{name}</div>
+        {stageLabel && <span className={`tag shrink-0 text-xs ${stageColor}`}>{stageLabel}</span>}
+      </div>
+      <div className="text-sm text-zinc-500 truncate mb-3">{sub || '—'}</div>
+      {tags && tags.length > 0 && (
+        <div className="flex flex-wrap gap-1.5">
+          {tags.map((t, i) => <span key={i} className="tag bg-zinc-800 text-zinc-400 text-xs border border-zinc-700/50">{t}</span>)}
+        </div>
+      )}
+    </Link>
+  );
 }
 
-function EntitySection({ title, items }) {
+// ── Section ──────────────────────────────────────────────────
+function EntitySection({ title, icon, items, emptyHref, emptyLabel, addHref, addLabel, gridCols = 'grid sm:grid-cols-2 lg:grid-cols-3 gap-4' }) {
   return (
     <section>
-      <h2 className="text-lg font-semibold text-zinc-200 mb-3">{title}</h2>
-      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
-        {items.map(item => (
-          <Link key={item.id} href={item.href} className="card hover:border-zinc-600 transition-all duration-200">
-            <div className="font-medium text-zinc-100 truncate">{item.name}</div>
-            <div className="text-sm text-zinc-400 truncate mt-0.5">{item.sub}</div>
-            <div className="flex flex-wrap gap-1 mt-2">
-              {item.tags.map(t => <span key={t} className="tag bg-zinc-700 text-zinc-300 text-xs">{t}</span>)}
-            </div>
-          </Link>
-        ))}
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="section-heading flex items-center gap-2">
+          <span className="text-lg">{icon}</span>
+          <span className="gradient-text">{title}</span>
+        </h2>
+        <Link href={addHref} className="btn-primary text-xs py-1.5 px-3">
+          + {addLabel}
+        </Link>
       </div>
+      {items.length === 0 ? (
+        <div className="card border-dashed border-2 border-zinc-800 flex items-center justify-center py-10 rounded-2xl">
+          <Link href={emptyHref} className="text-zinc-600 hover:text-cyan-400 transition-colors text-sm">{emptyLabel}</Link>
+        </div>
+      ) : (
+        <div className={gridCols}>
+          {items.map((item, i) => (
+            <EntityCard key={item.id || i} {...item} />
+          ))}
+        </div>
+      )}
     </section>
   );
 }
 
-function EmptyState({ href, label }) {
+// ── Icons ───────────────────────────────────────────────────
+function PersonIcon() {
   return (
-    <div className="card border-dashed border-2 border-zinc-800 flex items-center justify-center py-10">
-      <Link href={href} className="text-zinc-500 hover:text-violet-400 transition-colors text-sm">{label}</Link>
-    </div>
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-blue-400">
+      <circle cx="10" cy="6" r="3.5" />
+      <path d="M3 17c0-3.866 3.134-7 7-7s7 3.134 7 7" />
+    </svg>
+  );
+}
+function ProjectIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-emerald-400">
+      <rect x="2" y="3" width="16" height="14" rx="2" />
+      <path d="M2 7h16M7 3v4" />
+    </svg>
+  );
+}
+function IdeaIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-amber-400">
+      <path d="M10 2v3M10 15v3M2 10h3M15 10h3" />
+      <circle cx="10" cy="10" r="4" />
+    </svg>
+  );
+}
+function OpportunityIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-violet-400">
+      <path d="M10 2L12.5 7.5H18L13.5 11L15.5 17L10 13.5L4.5 17L6.5 11L2 7.5H7.5L10 2Z" />
+    </svg>
   );
 }
 
+// ── Dashboard inner ──────────────────────────────────────────
 function DashboardInner() {
   const searchParams = useSearchParams();
   const search = searchParams.get('search') || '';
@@ -116,7 +163,7 @@ function DashboardInner() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-20">
+      <div className="flex items-center justify-center py-24">
         <div className="spinner" />
       </div>
     );
@@ -124,9 +171,9 @@ function DashboardInner() {
 
   if (error) {
     return (
-      <div className="text-center py-20">
-        <div className="text-red-400 mb-2">⚠️ {error}</div>
-        <div className="text-zinc-500 text-sm">Переконайтесь, що сервер запущено.</div>
+      <div className="text-center py-24 space-y-3">
+        <div className="text-red-400 text-xl font-medium">⚠️ {error}</div>
+        <div className="text-zinc-600 text-sm">Переконайтесь, що сервер запущено.</div>
       </div>
     );
   }
@@ -134,26 +181,36 @@ function DashboardInner() {
   const filtered = search;
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-10">
+      {/* Hero gradient bar */}
+      {!filtered && (
+        <div className="hero-gradient rounded-2xl p-6 mb-2">
+          <h1 className="text-2xl font-bold text-white mb-1">AI Nexus Platform</h1>
+          <p className="text-zinc-400 text-sm">Ваш другий мозок для фаундерів</p>
+        </div>
+      )}
+
       {/* Search banner */}
       {filtered && (
-        <div className="bg-brand-950 border border-brand-800/30 rounded-2xl p-4 flex items-center justify-between">
-          <div className="text-sm text-violet-300">
+        <div className="cyber-card flex items-center justify-between">
+          <div className="text-sm text-cyan-400">
             🔍 Результати пошуку: <strong className="text-white">{filtered}</strong>
           </div>
-          <Link href="/" className="btn-secondary text-sm py-1.5">Очистити</Link>
+          <Link href="/" className="btn-secondary text-xs py-1.5">Очистити</Link>
         </div>
       )}
 
       {/* Stats cards */}
       {!filtered && stats && (
         <section>
-          <h2 className="text-lg font-semibold mb-4 text-zinc-200">Дашборд</h2>
+          <h2 className="section-heading mb-4 flex items-center gap-2">
+            <span>📊</span> Дашборд
+          </h2>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            <EntityCard href="/?tab=people" icon={<PersonIcon />} label="Люди" count={stats.people} accent="bg-blue-900/50 text-blue-300" />
-            <EntityCard href="/?tab=projects" icon={<ProjectIcon />} label="Проєкти" count={stats.projects} accent="bg-green-900/50 text-green-300" />
-            <EntityCard href="/?tab=ideas" icon={<IdeaIcon />} label="Ідеї" count={stats.ideas} accent="bg-amber-900/50 text-amber-300" />
-            <EntityCard href="/?tab=opportunities" icon={<OpportunityIcon />} label="Можливості" count={stats.opportunities} accent="bg-purple-900/50 text-purple-300" />
+            <StatCard href="/?tab=people" icon={<PersonIcon />} label="Люди" count={stats.people} accent="bg-blue-500/20" delay={0} />
+            <StatCard href="/?tab=projects" icon={<ProjectIcon />} label="Проєкти" count={stats.projects} accent="bg-emerald-500/20" delay={80} />
+            <StatCard href="/?tab=ideas" icon={<IdeaIcon />} label="Ідеї" count={stats.ideas} accent="bg-amber-500/20" delay={160} />
+            <StatCard href="/?tab=opportunities" icon={<OpportunityIcon />} label="Можливості" count={stats.opportunities} accent="bg-violet-500/20" delay={240} />
           </div>
         </section>
       )}
@@ -161,13 +218,15 @@ function DashboardInner() {
       {/* Idea pipeline */}
       {!filtered && stats && Object.keys(stats.idea_stages || {}).length > 0 && (
         <section>
-          <h2 className="text-lg font-semibold mb-4 text-zinc-200">Пайплайн ідей</h2>
+          <h2 className="section-heading mb-4 flex items-center gap-2">
+            <span>💡</span> Пайплайн ідей
+          </h2>
           <div className="flex flex-wrap gap-2">
             {Object.entries(stats.idea_stages).map(([stage, count]) => {
               const info = IDEA_STAGES[stage] || { label: stage, color: 'bg-zinc-700 text-zinc-300' };
               return (
                 <div key={stage} className={`tag ${info.color}`}>
-                  {info.label}: {count}
+                  {info.label}: <span className="font-bold ml-1">{String(count)}</span>
                 </div>
               );
             })}
@@ -178,109 +237,78 @@ function DashboardInner() {
       {/* Full lists when not searching */}
       {!filtered && (
         <>
-          {/* People */}
-          <section>
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold text-zinc-200">👤 Люди</h2>
-              <Link href="/add?type=person" className="btn-primary text-sm py-1.5">+ Додати</Link>
-            </div>
-            {people.length === 0 ? (
-              <EmptyState href="/add?type=person" label="Додати першу людину" />
-            ) : (
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                {people.slice(0, 12).map(p => (
-                  <Link key={p.id} href={`/people/${p.id}`} className="card hover:border-zinc-600 transition-all duration-200">
-                    <div className="font-medium text-zinc-100 truncate">{p.name}</div>
-                    <div className="text-sm text-zinc-400 truncate mt-0.5">{p.role || p.expertise || '—'}</div>
-                    <div className="flex flex-wrap gap-1 mt-2">
-                      {p.expertise?.split(',').slice(0, 2).map(t => t.trim()).filter(Boolean).map(t => (
-                        <span key={t} className="tag tag-people">{t}</span>
-                      ))}
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            )}
-          </section>
+          <EntitySection
+            title="Люди"
+            icon="👤"
+            items={people.slice(0, 12).map(p => ({
+              id: p.id,
+              name: p.name,
+              sub: p.role || p.expertise || '—',
+              tags: p.expertise ? p.expertise.split(',').map(t => t.trim()).filter(Boolean).slice(0, 2) : [],
+              href: `/people/${p.id}`,
+            }))}
+            emptyHref="/add?type=person"
+            emptyLabel="Додати першу людину"
+            addHref="/add?type=person"
+            addLabel="Людину"
+          />
 
-          {/* Projects */}
-          <section>
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold text-zinc-200">🚀 Проєкти</h2>
-              <Link href="/add?type=project" className="btn-primary text-sm py-1.5">+ Додати</Link>
-            </div>
-            {projects.length === 0 ? (
-              <EmptyState href="/add?type=project" label="Додати перший проєкт" />
-            ) : (
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                {projects.map(p => {
-                  const stageInfo = PROJECT_STAGES[p.stage] || { label: p.stage || 'Planning', color: 'bg-zinc-700 text-zinc-300' };
-                  return (
-                    <Link key={p.id} href={`/projects/${p.id}`} className="card hover:border-zinc-600 transition-all duration-200">
-                      <div className="flex items-start justify-between gap-2">
-                        <div className="font-medium text-zinc-100 truncate">{p.name}</div>
-                        <span className={`tag shrink-0 ${stageInfo.color}`}>{stageInfo.label}</span>
-                      </div>
-                      <div className="text-sm text-zinc-400 line-clamp-2 mt-1">{p.description || '—'}</div>
-                      <div className="flex gap-1 mt-2 flex-wrap">
-                        {p.people?.slice(0, 2).map(person => (
-                          <span key={person.id} className="tag bg-zinc-700 text-zinc-300 text-xs">{person.name}</span>
-                        ))}
-                      </div>
-                    </Link>
-                  );
-                })}
-              </div>
-            )}
-          </section>
+          <EntitySection
+            title="Проєкти"
+            icon="🚀"
+            items={projects.map(p => {
+              const stageInfo = PROJECT_STAGES[p.stage] || { label: p.stage || 'Planning', color: 'bg-zinc-700 text-zinc-300' };
+              return {
+                id: p.id,
+                name: p.name,
+                sub: p.description || '—',
+                stageLabel: stageInfo.label,
+                stageColor: stageInfo.color,
+                tags: p.people?.slice(0, 2).map(person => person.name),
+                href: `/projects/${p.id}`,
+              };
+            })}
+            emptyHref="/add?type=project"
+            emptyLabel="Додати перший проєкт"
+            addHref="/add?type=project"
+            addLabel="Проєкт"
+          />
 
-          {/* Ideas */}
-          <section>
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold text-zinc-200">💡 Ідеї</h2>
-              <Link href="/add?type=idea" className="btn-primary text-sm py-1.5">+ Додати</Link>
-            </div>
-            {ideas.length === 0 ? (
-              <EmptyState href="/add?type=idea" label="Додати першу ідею" />
-            ) : (
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                {ideas.map(i => {
-                  const stageInfo = IDEA_STAGES[i.status] || { label: i.status || 'Hypothesis', color: 'bg-zinc-700 text-zinc-300' };
-                  return (
-                    <Link key={i.id} href={`/ideas/${i.id}`} className="card hover:border-zinc-600 transition-all duration-200">
-                      <div className="flex items-start justify-between gap-2">
-                        <div className="font-medium text-zinc-100 truncate">{i.name}</div>
-                        <span className={`tag shrink-0 ${stageInfo.color}`}>{stageInfo.label}</span>
-                      </div>
-                      <div className="text-sm text-zinc-400 line-clamp-2 mt-1">{i.pitch || '—'}</div>
-                      {i.author && <div className="text-xs text-zinc-500 mt-2">Автор: {i.author}</div>}
-                    </Link>
-                  );
-                })}
-              </div>
-            )}
-          </section>
+          <EntitySection
+            title="Ідеї"
+            icon="💡"
+            items={ideas.map(i => {
+              const stageInfo = IDEA_STAGES[i.status] || { label: i.status || 'Hypothesis', color: 'bg-zinc-700 text-zinc-300' };
+              return {
+                id: i.id,
+                name: i.name,
+                sub: i.pitch || '—',
+                stageLabel: stageInfo.label,
+                stageColor: stageInfo.color,
+                href: `/ideas/${i.id}`,
+              };
+            })}
+            emptyHref="/add?type=idea"
+            emptyLabel="Додати першу ідею"
+            addHref="/add?type=idea"
+            addLabel="Ідею"
+          />
 
-          {/* Opportunities */}
-          <section>
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold text-zinc-200">🧩 Можливості</h2>
-              <Link href="/add?type=opportunity" className="btn-primary text-sm py-1.5">+ Додати</Link>
-            </div>
-            {opportunities.length === 0 ? (
-              <EmptyState href="/add?type=opportunity" label="Додати першу можливість" />
-            ) : (
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                {opportunities.map(o => (
-                  <Link key={o.id} href={`/opportunities/${o.id}`} className="card hover:border-zinc-600 transition-all duration-200">
-                    <div className="font-medium text-zinc-100 truncate">{o.name}</div>
-                    <div className="text-sm text-zinc-400 line-clamp-2 mt-1">{o.description || '—'}</div>
-                    {o.category && <span className="tag tag-opportunity mt-2">{o.category}</span>}
-                  </Link>
-                ))}
-              </div>
-            )}
-          </section>
+          <EntitySection
+            title="Можливості"
+            icon="🧩"
+            items={opportunities.map(o => ({
+              id: o.id,
+              name: o.name,
+              sub: o.description || '—',
+              tags: o.category ? [o.category] : [],
+              href: `/opportunities/${o.id}`,
+            }))}
+            emptyHref="/add?type=opportunity"
+            emptyLabel="Додати першу можливість"
+            addHref="/add?type=opportunity"
+            addLabel="Можливість"
+          />
         </>
       )}
 
@@ -288,32 +316,34 @@ function DashboardInner() {
       {filtered && (
         <>
           {people.length > 0 && (
-            <EntitySection title={`👤 Люди (${people.length})`} items={people.map(p => ({
+            <EntitySection title={`Люди (${people.length})`} icon="👤" items={people.map(p => ({
               id: p.id, name: p.name, sub: p.role || p.expertise || '—',
               tags: p.expertise ? p.expertise.split(',').map(t => t.trim()).filter(Boolean).slice(0, 2) : [],
               href: `/people/${p.id}`,
-            }))} />
+            }))} emptyHref="" emptyLabel="" addHref="" addLabel="" />
           )}
           {projects.length > 0 && (
-            <EntitySection title={`🚀 Проєкти (${projects.length})`} items={projects.map(p => ({
+            <EntitySection title={`Проєкти (${projects.length})`} icon="🚀" items={projects.map(p => ({
               id: p.id, name: p.name, sub: p.stage || '—',
-              tags: p.stage ? [PROJECT_STAGES[p.stage]?.label || p.stage] : [],
+              stageLabel: PROJECT_STAGES[p.stage]?.label || p.stage,
+              stageColor: PROJECT_STAGES[p.stage]?.color || 'bg-zinc-700',
               href: `/projects/${p.id}`,
-            }))} />
+            }))} emptyHref="" emptyLabel="" addHref="" addLabel="" />
           )}
           {ideas.length > 0 && (
-            <EntitySection title={`💡 Ідеї (${ideas.length})`} items={ideas.map(i => ({
+            <EntitySection title={`Ідеї (${ideas.length})`} icon="💡" items={ideas.map(i => ({
               id: i.id, name: i.name, sub: i.status || 'Hypothesis',
-              tags: i.status ? [IDEA_STAGES[i.status]?.label || i.status] : [],
+              stageLabel: IDEA_STAGES[i.status]?.label || i.status,
+              stageColor: IDEA_STAGES[i.status]?.color || 'bg-zinc-700',
               href: `/ideas/${i.id}`,
-            }))} />
+            }))} emptyHref="" emptyLabel="" addHref="" addLabel="" />
           )}
           {opportunities.length > 0 && (
-            <EntitySection title={`🧩 Можливості (${opportunities.length})`} items={opportunities.map(o => ({
+            <EntitySection title={`Можливості (${opportunities.length})`} icon="🧩" items={opportunities.map(o => ({
               id: o.id, name: o.name, sub: o.category || '—',
               tags: o.category ? [o.category] : [],
               href: `/opportunities/${o.id}`,
-            }))} />
+            }))} emptyHref="" emptyLabel="" addHref="" addLabel="" />
           )}
         </>
       )}
@@ -323,7 +353,7 @@ function DashboardInner() {
 
 export default function DashboardPage() {
   return (
-    <Suspense fallback={<div className="flex justify-center py-20"><div className="spinner" /></div>}>
+    <Suspense fallback={<div className="flex justify-center py-24"><div className="spinner" /></div>}>
       <DashboardInner />
     </Suspense>
   );

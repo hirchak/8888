@@ -16,7 +16,7 @@ function NexusIcon() {
   );
 }
 
-function GridIcon({ active }) {
+function GridIcon() {
   return (
     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
       <rect x="1" y="1" width="6" height="6" rx="1.5"/>
@@ -27,7 +27,7 @@ function GridIcon({ active }) {
   );
 }
 
-function PlusIcon({ active }) {
+function PlusIcon() {
   return (
     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
       <line x1="8" y1="2" x2="8" y2="14" strokeLinecap="round"/>
@@ -38,11 +38,11 @@ function PlusIcon({ active }) {
 
 export function Logo() {
   return (
-    <Link href="/" className="flex items-center gap-3 no-underline group">
-      <div className="w-8 h-8 rounded-lg bg-brand-600 flex items-center justify-center transition-all duration-200 group-hover:bg-brand-500 group-hover:shadow-glow-sm">
+    <Link href="/" className="flex items-center gap-2.5 no-underline group">
+      <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-cyan-600 to-violet-600 flex items-center justify-center transition-all duration-300 group-hover:shadow-lg group-hover:shadow-cyan-600/30 group-hover:scale-105">
         <NexusIcon />
       </div>
-      <span className="font-bold text-lg tracking-tight hidden sm:block text-zinc-100 group-hover:text-white transition-colors">
+      <span className="font-bold text-base tracking-tight hidden sm:block text-zinc-100 group-hover:text-white transition-colors duration-200">
         AI Nexus
       </span>
     </Link>
@@ -58,14 +58,14 @@ export function NavLinks() {
         href="/"
         className={`nav-link ${pathname === '/' ? 'nav-link-active' : 'nav-link-inactive'}`}
       >
-        <GridIcon active={pathname === '/'} />
+        <GridIcon />
         <span className="hidden sm:inline">Дашборд</span>
       </Link>
       <Link
         href="/add"
         className={`nav-link ${pathname === '/add' ? 'nav-link-active' : 'nav-link-inactive'}`}
       >
-        <PlusIcon active={pathname === '/add'} />
+        <PlusIcon />
         <span className="hidden sm:inline">Додати</span>
       </Link>
     </nav>
