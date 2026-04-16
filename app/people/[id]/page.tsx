@@ -24,6 +24,12 @@ export default function PersonPage() {
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState(false);
+  const [showProjectPicker, setShowProjectPicker] = useState(false);
+  const [showIdeaPicker, setShowIdeaPicker] = useState(false);
+  const [allProjects, setAllProjects] = useState<any[]>([]);
+  const [allIdeas, setAllIdeas] = useState<any[]>([]);
+  const [linkingProject, setLinkingProject] = useState<number | null>(null);
+  const [linkingIdea, setLinkingIdea] = useState<number | null>(null);
 
   useEffect(() => { load(); }, [id]);
 
@@ -69,6 +75,44 @@ export default function PersonPage() {
       router.push('/');
     } catch (e) {
       alert(e.message);
+    }
+  }
+
+  async function openProjectPicker() {
+    const projects = await api.listProjects();
+    setAllProjects(projects);
+    setShowProjectPicker(true);
+  }
+
+  async function openIdeaPicker() {
+    const ideas = await api.listIdeas();
+    setAllIdeas(ideas);
+    setShowIdeaPicker(true);
+  }
+
+  async function linkProject(projectId: number) {
+    setLinkingProject(projectId);
+    try {
+      await api.createLink('person', Number(id), 'project', projectId);
+      await load();
+      setShowProjectPicker(false);
+    } catch (e) {
+      alert(e.message);
+    } finally {
+      setLinkingProject(null);
+    }
+  }
+
+  async function linkIdea(ideaId: number) {
+    setLinkingIdea(ideaId);
+    try {
+      await api.createLink('person', Number(id), 'idea', ideaId);
+      await load();
+      setShowIdeaPicker(false);
+    } catch (e) {
+      alert(e.message);
+    } finally {
+      setLinkingIdea(null);
     }
   }
 
@@ -152,9 +196,35 @@ export default function PersonPage() {
 
       {/* Projects */}
       <div className="cyber-card">
-        <h3 className="text-sm font-semibold text-zinc-400 mb-4 flex items-center gap-2">
-          <span>🚀</span> Проєкти
-        </h3>
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-sm font-semibold text-zinc-400 flex items-center gap-2">
+            <span>🚀</span> Проєкти
+          </h3>
+          <button onClick={openProjectPicker} className="btn-secondary text-xs py-1.5 px-3 rounded-xl">
+            + Прив&apos;язати
+          </button>
+        </div>
+
+        {showProjectPicker && (
+          <div className="mb-3 p-3 bg-zinc-900/80 border border-zinc-700/50 rounded-xl space-y-1.5">
+            <div className="text-xs text-zinc-500 mb-2 font-medium">Оберіть проєкт:</div>
+            {allProjects.filter(p => !person.projects?.some(lp => lp.id === p.id)).map(p => (
+              <button
+                key={p.id}
+                onClick={() => linkProject(p.id)}
+                disabled={linkingProject !== null}
+                className="w-full text-left px-3 py-2 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-sm transition-colors disabled:opacity-50"
+              >
+                {p.name}
+              </button>
+            ))}
+            {allProjects.filter(p => !person.projects?.some(lp => lp.id === p.id)).length === 0 && (
+              <p className="text-zinc-600 text-xs">Всі проєкти вже прив&apos;язані</p>
+            )}
+            <button onClick={() => setShowProjectPicker(false)} className="w-full text-center text-xs text-zinc-600 hover:text-zinc-400 mt-2">Закрити</button>
+          </div>
+        )}
+
         {person.projects?.length > 0 ? (
           <div className="space-y-2">
             {person.projects.map(p => (
@@ -164,16 +234,42 @@ export default function PersonPage() {
               </Link>
             ))}
           </div>
-        ) : (
+        ) : !showProjectPicker && (
           <p className="text-zinc-600 text-sm py-2">Немає прив&apos;язаних проєктів</p>
         )}
       </div>
 
       {/* Ideas */}
       <div className="cyber-card">
-        <h3 className="text-sm font-semibold text-zinc-400 mb-4 flex items-center gap-2">
-          <span>💡</span> Ідеї
-        </h3>
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-sm font-semibold text-zinc-400 flex items-center gap-2">
+            <span>💡</span> Ідеї
+          </h3>
+          <button onClick={openIdeaPicker} className="btn-secondary text-xs py-1.5 px-3 rounded-xl">
+            + Прив&apos;язати
+          </button>
+        </div>
+
+        {showIdeaPicker && (
+          <div className="mb-3 p-3 bg-zinc-900/80 border border-zinc-700/50 rounded-xl space-y-1.5">
+            <div className="text-xs text-zinc-500 mb-2 font-medium">Оберіть ідею:</div>
+            {allIdeas.filter(i => !person.ideas?.some(li => li.id === i.id)).map(i => (
+              <button
+                key={i.id}
+                onClick={() => linkIdea(i.id)}
+                disabled={linkingIdea !== null}
+                className="w-full text-left px-3 py-2 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-sm transition-colors disabled:opacity-50"
+              >
+                {i.name}
+              </button>
+            ))}
+            {allIdeas.filter(i => !person.ideas?.some(li => li.id === i.id)).length === 0 && (
+              <p className="text-zinc-600 text-xs">Всі ідеї вже прив&apos;язані</p>
+            )}
+            <button onClick={() => setShowIdeaPicker(false)} className="w-full text-center text-xs text-zinc-600 hover:text-zinc-400 mt-2">Закрити</button>
+          </div>
+        )}
+
         {person.ideas?.length > 0 ? (
           <div className="space-y-2">
             {person.ideas.map(i => {
@@ -186,7 +282,7 @@ export default function PersonPage() {
               );
             })}
           </div>
-        ) : (
+        ) : !showIdeaPicker && (
           <p className="text-zinc-600 text-sm py-2">Немає прив&apos;язаних ідей</p>
         )}
       </div>

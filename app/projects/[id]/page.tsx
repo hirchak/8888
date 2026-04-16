@@ -24,6 +24,12 @@ export default function ProjectPage() {
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState<Record<string,string>>({});
   const [saving, setSaving] = useState(false);
+  const [showPersonPicker, setShowPersonPicker] = useState(false);
+  const [showOppPicker, setShowOppPicker] = useState(false);
+  const [allPeople, setAllPeople] = useState<any[]>([]);
+  const [allOpps, setAllOpps] = useState<any[]>([]);
+  const [linkingPerson, setLinkingPerson] = useState(false);
+  const [linkingOpp, setLinkingOpp] = useState(false);
 
   useEffect(() => { load(); }, [id]);
 
@@ -45,6 +51,38 @@ export default function ProjectPage() {
     } finally {
       setLoading(false);
     }
+  }
+
+  async function openPersonPicker() {
+    const people = await api.listPeople();
+    setAllPeople(people);
+    setShowPersonPicker(true);
+  }
+
+  async function openOppPicker() {
+    const opps = await api.listOpportunities();
+    setAllOpps(opps);
+    setShowOppPicker(true);
+  }
+
+  async function linkPerson(personId: number) {
+    setLinkingPerson(true);
+    try {
+      await api.createLink('project', Number(id), 'person', personId);
+      await load();
+      setShowPersonPicker(false);
+    } catch (e) { alert(e.message); }
+    finally { setLinkingPerson(false); }
+  }
+
+  async function linkOpp(oppId: number) {
+    setLinkingOpp(true);
+    try {
+      await api.createLink('project', Number(id), 'opportunity', oppId);
+      await load();
+      setShowOppPicker(false);
+    } catch (e) { alert(e.message); }
+    finally { setLinkingOpp(false); }
   }
 
   async function save() {
@@ -128,7 +166,21 @@ export default function ProjectPage() {
 
       {/* People */}
       <div className="card">
-        <h3 className="text-sm font-semibold text-zinc-400 mb-3">👤 Команда</h3>
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-sm font-semibold text-zinc-400">👤 Команда</h3>
+          <button onClick={openPersonPicker} className="btn-secondary text-xs py-1.5 px-3 rounded-xl">+ Прив&apos;язати</button>
+        </div>
+        {showPersonPicker && (
+          <div className="mb-3 p-3 bg-zinc-900/80 border border-zinc-700/50 rounded-xl space-y-1.5">
+            {allPeople.filter(p => !project.people?.some(lp => lp.id === p.id)).map(p => (
+              <button key={p.id} onClick={() => linkPerson(p.id)} disabled={linkingPerson} className="w-full text-left px-3 py-2 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-sm transition-colors disabled:opacity-50">
+                {p.name}
+              </button>
+            ))}
+            {allPeople.filter(p => !project.people?.some(lp => lp.id === p.id)).length === 0 && <p className="text-zinc-600 text-xs">Всі люди вже прив&apos;язані</p>}
+            <button onClick={() => setShowPersonPicker(false)} className="w-full text-center text-xs text-zinc-600 hover:text-zinc-400 mt-2">Закрити</button>
+          </div>
+        )}
         {project.people?.length > 0 ? (
           <div className="space-y-2">
             {project.people.map(p => (
@@ -139,12 +191,26 @@ export default function ProjectPage() {
               </Link>
             ))}
           </div>
-        ) : <p className="text-zinc-500 text-sm">Немає учасників</p>}
+        ) : !showPersonPicker && <p className="text-zinc-500 text-sm">Немає учасників</p>}
       </div>
 
       {/* Opportunities */}
       <div className="card">
-        <h3 className="text-sm font-semibold text-zinc-400 mb-3">🧩 Можливості</h3>
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-sm font-semibold text-zinc-400">🧩 Можливості</h3>
+          <button onClick={openOppPicker} className="btn-secondary text-xs py-1.5 px-3 rounded-xl">+ Прив&apos;язати</button>
+        </div>
+        {showOppPicker && (
+          <div className="mb-3 p-3 bg-zinc-900/80 border border-zinc-700/50 rounded-xl space-y-1.5">
+            {allOpps.filter(o => !project.opportunities?.some(lo => lo.id === o.id)).map(o => (
+              <button key={o.id} onClick={() => linkOpp(o.id)} disabled={linkingOpp} className="w-full text-left px-3 py-2 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-sm transition-colors disabled:opacity-50">
+                {o.name}
+              </button>
+            ))}
+            {allOpps.filter(o => !project.opportunities?.some(lo => lo.id === o.id)).length === 0 && <p className="text-zinc-600 text-xs">Всі можливості вже прив&apos;язані</p>}
+            <button onClick={() => setShowOppPicker(false)} className="w-full text-center text-xs text-zinc-600 hover:text-zinc-400 mt-2">Закрити</button>
+          </div>
+        )}
         {project.opportunities?.length > 0 ? (
           <div className="space-y-2">
             {project.opportunities.map(o => (
@@ -154,7 +220,7 @@ export default function ProjectPage() {
               </Link>
             ))}
           </div>
-        ) : <p className="text-zinc-500 text-sm">Немає прив&apos;язаних можливостей</p>}
+        ) : !showOppPicker && <p className="text-zinc-500 text-sm">Немає прив&apos;язаних можливостей</p>}
       </div>
 
       {/* Meta */}
