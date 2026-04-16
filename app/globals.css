@@ -1,0 +1,182 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    @apply bg-[#09090b] text-zinc-100 antialiased;
+    font-family: var(--font-jakarta), 'Plus Jakarta Sans', system-ui, sans-serif;
+    scroll-behavior: smooth;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    @apply bg-zinc-900;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-zinc-700 rounded-full;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-zinc-600;
+  }
+
+  /* Text selection */
+  ::selection {
+    @apply bg-violet-600/40 text-white;
+  }
+
+  /* Focus visible — accessibility */
+  :focus-visible {
+    @apply outline-none ring-2 ring-violet-500 ring-offset-2 ring-offset-[#09090b];
+  }
+
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+@layer components {
+  /* ── Cards ── */
+  .card {
+    @apply bg-zinc-900/90 border border-zinc-800/80 rounded-2xl p-5;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.03) inset;
+    transition: box-shadow 200ms ease, border-color 200ms ease, transform 200ms ease;
+  }
+  .card:hover {
+    @apply border-zinc-700/80;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.05) inset;
+  }
+
+  /* ── Buttons ── */
+  .btn-primary {
+    @apply bg-violet-600 hover:bg-violet-500 text-white px-4 py-2 rounded-xl font-semibold transition-all duration-200 cursor-pointer;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.3);
+  }
+  .btn-primary:hover {
+    box-shadow: 0 4px 12px rgba(124, 58, 237, 0.4);
+    transform: translateY(-1px);
+  }
+  .btn-primary:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.3);
+  }
+  .btn-primary:disabled {
+    @apply opacity-50 cursor-not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+
+  .btn-danger {
+    @apply bg-red-950/60 hover:bg-red-900/70 text-red-300 px-4 py-2 rounded-xl font-semibold transition-all duration-200 cursor-pointer border border-red-900/50;
+  }
+  .btn-danger:hover {
+    @apply bg-red-900/60;
+    box-shadow: 0 2px 8px rgba(220,38,38,0.2);
+  }
+
+  .btn-secondary {
+    @apply bg-zinc-800/80 hover:bg-zinc-700/80 text-zinc-200 px-4 py-2 rounded-xl font-medium transition-all duration-200 cursor-pointer border border-zinc-700/60;
+  }
+  .btn-secondary:hover {
+    @apply bg-zinc-700/70 border-zinc-600/60;
+  }
+
+  /* Ghost button for subtle actions */
+  .btn-ghost {
+    @apply text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/60 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150 cursor-pointer;
+  }
+
+  /* ── Inputs ── */
+  .input-field {
+    @apply w-full bg-zinc-800/80 border border-zinc-700/70 rounded-xl px-4 py-2.5 text-zinc-100 placeholder-zinc-500 transition-all duration-200;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.2) inset;
+  }
+  .input-field:focus {
+    @apply border-violet-500/70;
+    box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.15) inset, 0 1px 2px rgba(0,0,0,0.2) inset;
+  }
+  .input-field:hover:not(:focus) {
+    @apply border-zinc-600/70;
+  }
+
+  /* ── Labels ── */
+  .label {
+    @apply block text-sm font-medium text-zinc-400 mb-1.5;
+  }
+
+  /* ── Tags / Badges ── */
+  .tag {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold;
+  }
+
+  /* Entity-specific tags */
+  .tag-people    { @apply bg-blue-900/50 text-blue-300 border border-blue-800/40; }
+  .tag-project   { @apply bg-emerald-900/50 text-emerald-300 border border-emerald-800/40; }
+  .tag-idea      { @apply bg-amber-900/50 text-amber-300 border border-amber-800/40; }
+  .tag-opportunity { @apply bg-violet-900/50 text-violet-300 border border-violet-800/40; }
+
+  /* ── Navigation ── */
+  .nav-link {
+    @apply flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-150;
+  }
+  .nav-link-active {
+    @apply bg-violet-600/20 text-violet-300 border border-violet-500/20;
+  }
+  .nav-link-inactive {
+    @apply text-zinc-500 hover:text-zinc-200 hover:bg-zinc-800/70 border border-transparent;
+  }
+
+  /* ── Spinner ── */
+  .spinner {
+    @apply w-8 h-8 border-2 border-violet-500 border-t-transparent rounded-full animate-spin;
+  }
+
+  /* ── Skeleton loader ── */
+  .skeleton {
+    @apply bg-zinc-800/60 rounded animate-pulse;
+  }
+
+  /* ── Divider ── */
+  .divider {
+    @apply border-t border-zinc-800/70 my-4;
+  }
+
+  /* ── Search highlight ── */
+  .search-highlight {
+    @apply bg-violet-600/30 text-violet-200 px-0.5 rounded-sm;
+  }
+
+  /* ── Entity card hover ── */
+  .entity-card-link {
+    @apply block no-underline;
+  }
+  .entity-card-link:hover h3,
+  .entity-card-link:hover .entity-name {
+    @apply text-white;
+  }
+}
+
+/* ── Stage colors (for Projects) ── */
+.stage-planning { @apply bg-zinc-700/70 text-zinc-300 border border-zinc-600/40; }
+.stage-mvp      { @apply bg-blue-900/50 text-blue-300 border border-blue-800/40; }
+.stage-beta     { @apply bg-amber-900/50 text-amber-300 border border-amber-800/40; }
+.stage-active   { @apply bg-emerald-900/50 text-emerald-300 border border-emerald-800/40; }
+.stage-paused   { @apply bg-red-900/40 text-red-400 border border-red-800/40; }
+
+/* ── Idea stage colors ── */
+.idea-hypothesis { @apply bg-zinc-700/70 text-zinc-300 border border-zinc-600/40; }
+.idea-research    { @apply bg-blue-900/50 text-blue-300 border border-blue-800/40; }
+.idea-resources   { @apply bg-amber-900/50 text-amber-300 border border-amber-800/40; }
+.idea-ready      { @apply bg-emerald-900/50 text-emerald-300 border border-emerald-800/40; }
+.idea-launched   { @apply bg-violet-900/50 text-violet-300 border border-violet-800/40; }
+.idea-paused     { @apply bg-red-900/40 text-red-400 border border-red-800/40; }
