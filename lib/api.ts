@@ -71,4 +71,13 @@ export const api = {
       method: 'DELETE',
       body: JSON.stringify({ source_type: sourceType, source_id: sourceId, target_type: targetType, target_id: targetId }),
     }),
+
+  // Tasks
+  listTasks: () => request('/api/tasks'),
+  createTask: (data: any) =>
+    request('/api/tasks', { method: 'POST', body: JSON.stringify(data) }),
+  updateTask: (id: number, data: any) =>
+    request(`/api/tasks/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+  deleteTask: (id: number) =>
+    request(`/api/tasks/${id}`, { method: 'DELETE' }),
 };

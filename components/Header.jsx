@@ -75,6 +75,13 @@ export function NavLinks() {
         <PlusIcon />
         <span className="hidden sm:inline">Додати</span>
       </Link>
+      <Link
+        href="/tasks"
+        className={`nav-link ${pathname === '/tasks' ? 'nav-link-active' : 'nav-link-inactive'}`}
+      >
+        <span className="text-base">📅</span>
+        <span className="hidden lg:inline">Задачі</span>
+      </Link>
     </nav>
   );
 }

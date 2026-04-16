@@ -11,7 +11,8 @@ if (!g.nexusData) {
     ideas: [],
     opportunities: [],
     links: [],
-    nextId: { people: 1, projects: 1, ideas: 1, opportunities: 1 },
+    tasks: [],
+    nextId: { people: 1, projects: 1, ideas: 1, opportunities: 1, tasks: 1 },
   };
 }
 
@@ -27,6 +28,17 @@ export type Link = {
   source_type: 'person' | 'project' | 'idea' | 'opportunity';
   target_id: number;
   target_type: 'person' | 'project' | 'idea' | 'opportunity';
+};
+
+export type Task = {
+  id: number;
+  title: string;
+  dueDate: string | null;
+  entityId: number | null;
+  entityType: 'person' | 'project' | 'idea' | 'opportunity' | null;
+  priority: 'high' | 'medium' | 'low';
+  status: 'open' | 'done';
+  createdAt: string;
 };
 
 export function getLinks(sourceType: string, sourceId: number, targetType: string) {

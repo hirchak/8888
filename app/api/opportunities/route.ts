@@ -48,6 +48,7 @@ export async function POST(req: NextRequest) {
       tags: data.tags || '',
       created_at: now,
       updated_at: now,
+      lastUsedAt: now,
     };
 
     db.opportunities.push(newItem);
