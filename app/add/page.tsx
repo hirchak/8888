@@ -10,6 +10,7 @@ const TABS = [
   { key: 'project', label: '🚀 Проєкт' },
   { key: 'idea', label: '💡 Ідея' },
   { key: 'opportunity', label: '🧩 Можливість' },
+  { key: 'quick', label: '⚡ Швидкий запис' },
 ];
 
 const IDEA_STATUSES = ['Hypothesis', 'Research', 'Resources', 'Ready', 'Launched', 'Paused'];
@@ -25,6 +26,143 @@ function Field({ label, value, onChange, type = 'text', placeholder, required = 
         ? <textarea value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} className="input-field min-h-[100px] resize-y" />
         : <input type={type} value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} className="input-field" />
       }
+    </div>
+  );
+}
+
+// ── Quick Add ───────────────────────────────────────────────
+function parseQuickInput(text: string) {
+  const result: { type: string; name: string; details: string }[] = [];
+  const lines = text.split('\n').filter(l => l.trim());
+
+  const ideaKeywords = ['ідея', 'ідею', 'гіпотеза', 'думаю', 'можна зробити', 'може бути', 'variant', 'concept', 'pitch', 'startup'];
+  const personKeywords = ['ceo', 'cto', 'coo', 'founder', 'партнер', 'експерт', 'людина', 'contact', 'зв\'язок', 'знайшов'];
+  const projectKeywords = ['проєкт', 'проект', 'продукт', 'launch', 'build', 'MVP', 'реліз', 'app', 'platform'];
+  const oppKeywords = ['можливість', 'оффер', 'пропозиція', 'bonus', 'знижка', 'access', 'free', 'кредит'];
+
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed) continue;
+    const lower = trimmed.toLowerCase();
+
+    if (ideaKeywords.some(k => lower.includes(k))) {
+      result.push({ type: 'idea', name: trimmed.slice(0, 60), details: trimmed });
+    } else if (oppKeywords.some(k => lower.includes(k))) {
+      result.push({ type: 'opportunity', name: trimmed.slice(0, 60), details: trimmed });
+    } else if (personKeywords.some(k => lower.includes(k))) {
+      result.push({ type: 'person', name: trimmed.slice(0, 60), details: trimmed });
+    } else if (projectKeywords.some(k => lower.includes(k))) {
+      result.push({ type: 'project', name: trimmed.slice(0, 60), details: trimmed });
+    } else {
+      // Default: treat as idea if first char is capital or has common patterns
+      result.push({ type: 'idea', name: trimmed.slice(0, 60), details: trimmed });
+    }
+  }
+
+  return result;
+}
+
+function QuickAddForm() {
+  const router = useRouter();
+  const [raw, setRaw] = useState('');
+  const [parsed, setParsed] = useState<{ type: string; name: string; details: string }[]>([]);
+  const [saving, setSaving] = useState(false);
+  const [created, setCreated] = useState<string[]>([]);
+
+  function handleRawChange(value: string) {
+    setRaw(value);
+    setParsed(parseQuickInput(value));
+  }
+
+  async function handleCreateAll() {
+    setSaving(true);
+    const made: string[] = [];
+    try {
+      for (const item of parsed) {
+        if (item.type === 'person') {
+          const p = await api.createPerson({ name: item.name, summary: item.details });
+          made.push(`👤 ${p.name}`);
+        } else if (item.type === 'project') {
+          const p = await api.createProject({ name: item.name, description: item.details });
+          made.push(`🚀 ${p.name}`);
+        } else if (item.type === 'idea') {
+          const p = await api.createIdea({ name: item.name, pitch: item.details });
+          made.push(`💡 ${p.name}`);
+        } else {
+          const p = await api.createOpportunity({ name: item.name, description: item.details });
+          made.push(`🧩 ${p.name}`);
+        }
+      }
+      setCreated(made);
+      setRaw('');
+      setParsed([]);
+    } catch (e) {
+      alert(e.message);
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="cyber-card">
+        <h3 className="text-sm font-semibold text-zinc-400 mb-3">Вставте текст</h3>
+        <textarea
+          value={raw}
+          onChange={e => handleRawChange(e.target.value)}
+          placeholder={`Вставте будь-який текст — нотатки, ідеї, контакти...
+
+Приклади:
+— Ідея: Закритий клуб для інвесторів
+— CEO Олександр Петренко, TechCorp
+— Проєкт: AI Nexus Platform
+— Можливість: Безкоштовні кредити на AWS`}
+          className="input-field min-h-[200px] resize-y font-mono text-sm"
+        />
+        <p className="text-xs text-zinc-600 mt-2">Система автоматично визначить тип кожного рядка</p>
+      </div>
+
+      {parsed.length > 0 && (
+        <div className="cyber-card">
+          <h3 className="text-sm font-semibold text-zinc-400 mb-3 flex items-center gap-2">
+            <span>👁️</span> Попередній перегляд — буде створено:
+          </h3>
+          <div className="space-y-1.5 mb-4">
+            {parsed.map((item, i) => (
+              <div key={i} className="flex items-center gap-2 px-3 py-2 rounded-xl bg-zinc-800/60 border border-zinc-700/40">
+                <span className="text-lg">
+                  {item.type === 'person' ? '👤' : item.type === 'project' ? '🚀' : item.type === 'idea' ? '💡' : '🧩'}
+                </span>
+                <div className="flex-1 min-w-0">
+                  <div className="text-zinc-200 text-sm font-medium truncate">{item.name}</div>
+                  <div className="text-zinc-600 text-xs truncate">{item.type}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+          <button
+            onClick={handleCreateAll}
+            disabled={saving}
+            className="btn-primary w-full py-3 text-base"
+          >
+            {saving ? 'Створення...' : `✅ Створити ${parsed.length} ${parsed.length === 1 ? 'запис' : 'записів'}`}
+          </button>
+        </div>
+      )}
+
+      {created.length > 0 && (
+        <div className="cyber-card border border-emerald-800/40">
+          <h3 className="text-sm font-semibold text-emerald-400 mb-3">✅ Створено:</h3>
+          <div className="space-y-1">
+            {created.map((c, i) => (
+              <div key={i} className="text-zinc-300 text-sm">{c}</div>
+            ))}
+          </div>
+          <button onClick={() => { setCreated([]); router.push('/'); }} className="btn-secondary w-full mt-4 py-2">
+            На головну
+          </button>
+        </div>
+      )}
     </div>
   );
 }
@@ -187,6 +325,9 @@ function AddForm() {
             </div>
           </>
         )}
+
+        {/* Quick Add */}
+        {tab === 'quick' && <QuickAddForm />}
 
         {/* Actions */}
         <div className="flex gap-3">
