@@ -5,71 +5,81 @@ export default function VoiceInput({ onTranscript }: { onTranscript: (text: stri
   const [recording, setRecording] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const mediaRecorder = useRef<MediaRecorder | null>(null);
-  const chunks = useRef<Blob[]>([]);
+  const recognitionRef = useRef<any>(null);
 
-  const start = async () => {
+  const start = () => {
     setError(null);
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      
-      // Fallback mime types
-      const mimeType = MediaRecorder.isTypeSupported('audio/ogg') 
-        ? 'audio/ogg' 
-        : MediaRecorder.isTypeSupported('audio/webm')
-          ? 'audio/webm'
-          : 'audio/mp4';
-      
-      const recorder = new MediaRecorder(stream, { mimeType });
-      mediaRecorder.current = recorder;
-      chunks.current = [];
-      
-      recorder.ondataavailable = (e) => {
-        if (e.data && e.data.size > 0) {
-          chunks.current.push(e.data);
+    
+    // Check browser support
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      setError('Твій браузер не підтримує розпізнавання мови. Спробуй Chrome або Edge.');
+      return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognitionRef.current = recognition;
+    
+    recognition.lang = 'uk-UA';
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    recognition.maxAlternatives = 1;
+    
+    let finalTranscript = '';
+    
+    recognition.onresult = (event: any) => {
+      let interimTranscript = '';
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const transcript = event.results[i][0].transcript;
+        if (event.results[i].isFinal) {
+          finalTranscript += transcript + ' ';
+        } else {
+          interimTranscript += transcript;
         }
-      };
+      }
       
-      recorder.onstop = async () => {
-        stream.getTracks().forEach(track => track.stop());
-        setLoading(true);
-        
-        const blob = new Blob(chunks.current, { type: mimeType });
-        const formData = new FormData();
-        formData.append('audio', blob, `voice.${mimeType.split('/')[1]}`);
-        
+      if (finalTranscript && interimTranscript) {
+        onTranscript(finalTranscript + interimTranscript);
+      } else if (finalTranscript) {
+        onTranscript(finalTranscript);
+      }
+    };
+    
+    recognition.onerror = (event: any) => {
+      if (event.error === 'no-speech') {
+        setError('Мова не виявлена. Спробуй ще раз.');
+      } else if (event.error === 'not-allowed') {
+        setError('Доступ до мікрофона заблоковано. Дозволь доступ в налаштуваннях браузера.');
+      } else {
+        setError('Помилка: ' + event.error);
+      }
+      setRecording(false);
+    };
+    
+    recognition.onend = () => {
+      if (recording) {
+        // Restart if still recording
         try {
-          const res = await fetch('/api/transcribe', { method: 'POST', body: formData });
-          const data = await res.json();
-          setLoading(false);
-          if (data.text) {
-            onTranscript(data.text);
-          } else {
-            setError('Текст не розпізнано. Спробуй ще раз.');
-          }
-        } catch (err) {
-          setLoading(false);
-          setError('Помилка транскрипції.');
+          recognition.start();
+        } catch {
+          setRecording(false);
         }
-      };
-      
-      recorder.onerror = (e) => {
-        setError('Помилка запису: ' + e);
-        setRecording(false);
-      };
-      
-      recorder.start(1000); // collect data every second
+      }
+    };
+    
+    try {
+      recognition.start();
       setRecording(true);
     } catch (err) {
-      setError('Не вдалося отримати доступ до мікрофона.');
+      setError('Не вдалося запустити запис.');
     }
   };
 
   const stop = () => {
-    if (mediaRecorder.current?.state === 'recording') {
-      mediaRecorder.current.stop();
+    if (recognitionRef.current) {
+      recognitionRef.current.stop();
+      setRecording(false);
     }
-    setRecording(false);
   };
 
   return (
@@ -82,17 +92,17 @@ export default function VoiceInput({ onTranscript }: { onTranscript: (text: stri
           </button>
         ) : (
           <button onClick={start} disabled={loading} className="btn-secondary flex items-center gap-2 px-6 py-3 text-base">
-            {loading ? '⏳ Обробка...' : '🎤 Записати'}
+            🎤 Записати
           </button>
         )}
       </div>
       
       {error && (
-        <p className="text-red-400 text-sm">{error}</p>
+        <p className="text-red-400 text-sm text-center max-w-xs">{error}</p>
       )}
       
       {recording && (
-        <p className="text-cyan-400 text-sm animate-pulse">🎙 Говори...</p>
+        <p className="text-cyan-400 text-sm animate-pulse">🎙 Говори українською...</p>
       )}
     </div>
   );
