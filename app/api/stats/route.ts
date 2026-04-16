@@ -5,23 +5,24 @@ export async function GET() {
   try {
     const db = getDb();
 
-    const peopleCount: any = db.prepare("SELECT COUNT(*) as count FROM people").get();
-    const projectsCount: any = db.prepare("SELECT COUNT(*) as count FROM projects").get();
-    const ideasCount: any = db.prepare("SELECT COUNT(*) as count FROM ideas").get();
-    const opportunitiesCount: any = db.prepare("SELECT COUNT(*) as count FROM opportunities").get();
-
-    const stageRows: any[] = db.prepare("SELECT stage, COUNT(*) as count FROM ideas GROUP BY stage").all();
+    const [peopleResult, projectsResult, ideasResult, opportunitiesResult, stageRows] = await Promise.all([
+      db.execute("SELECT COUNT(*) as count FROM people"),
+      db.execute("SELECT COUNT(*) as count FROM projects"),
+      db.execute("SELECT COUNT(*) as count FROM ideas"),
+      db.execute("SELECT COUNT(*) as count FROM opportunities"),
+      db.execute("SELECT status, COUNT(*) as count FROM ideas GROUP BY status"),
+    ]);
 
     const ideaStages: Record<string, number> = {};
-    for (const row of stageRows) {
-      ideaStages[row.stage] = row.count;
+    for (const row of stageRows.rows as any[]) {
+      ideaStages[row.status] = row.count;
     }
 
     return NextResponse.json({
-      people: peopleCount?.count ?? 0,
-      projects: projectsCount?.count ?? 0,
-      ideas: ideasCount?.count ?? 0,
-      opportunities: opportunitiesCount?.count ?? 0,
+      people: (peopleResult.rows[0] as any)?.count ?? 0,
+      projects: (projectsResult.rows[0] as any)?.count ?? 0,
+      ideas: (ideasResult.rows[0] as any)?.count ?? 0,
+      opportunities: (opportunitiesResult.rows[0] as any)?.count ?? 0,
       idea_stages: ideaStages,
     });
   } catch (e: any) {

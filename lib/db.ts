@@ -1,22 +1,20 @@
-import Database from 'better-sqlite3';
+import { createClient, type Client } from '@libsql/client';
 import path from 'path';
 
 const DB_PATH = path.join(process.cwd(), 'nexus.db');
 
-let _db: Database.Database | null = null;
+let _db: Client | null = null;
 
-export function getDb(): Database.Database {
+export function getDb(): Client {
   if (!_db) {
-    _db = new Database(DB_PATH);
-    _db.pragma('journal_mode = WAL');
-    _db.pragma('foreign_keys = ON');
+    _db = createClient({ url: `file:${DB_PATH}` });
     initDb(_db);
   }
   return _db;
 }
 
-function initDb(db: Database.Database) {
-  db.exec(`
+function initDb(db: Client) {
+  db.executeMultiple(`
     CREATE TABLE IF NOT EXISTS people (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT NOT NULL,
@@ -102,56 +100,68 @@ function initDb(db: Database.Database) {
 }
 
 // Helper to get linked projects for a person
-export function getLinkedProjects(db: Database.Database, personId: number) {
-  return db.prepare(`
-    SELECT pr.id, pr.name, pr.stage FROM projects pr
-    JOIN person_project_links l ON l.project_id = pr.id
-    WHERE l.person_id = ?
-  `).all(personId) as { id: number; name: string; stage: string }[];
+export async function getLinkedProjects(db: Client, personId: number) {
+  const result = await db.execute({
+    sql: `SELECT pr.id, pr.name, pr.stage FROM projects pr
+          JOIN person_project_links l ON l.project_id = pr.id
+          WHERE l.person_id = ?`,
+    args: [personId],
+  });
+  return result.rows as unknown as { id: number; name: string; stage: string }[];
 }
 
 // Helper to get linked ideas for a person
-export function getLinkedIdeas(db: Database.Database, personId: number) {
-  return db.prepare(`
-    SELECT i.id, i.name, i.status FROM ideas i
-    JOIN person_idea_links l ON l.idea_id = i.id
-    WHERE l.person_id = ?
-  `).all(personId) as { id: number; name: string; status: string }[];
+export async function getLinkedIdeas(db: Client, personId: number) {
+  const result = await db.execute({
+    sql: `SELECT i.id, i.name, i.status FROM ideas i
+          JOIN person_idea_links l ON l.idea_id = i.id
+          WHERE l.person_id = ?`,
+    args: [personId],
+  });
+  return result.rows as unknown as { id: number; name: string; status: string }[];
 }
 
 // Helper to get linked people for a project
-export function getLinkedPeople(db: Database.Database, projectId: number) {
-  return db.prepare(`
-    SELECT p.id, p.name, p.role FROM people p
-    JOIN person_project_links l ON l.person_id = p.id
-    WHERE l.project_id = ?
-  `).all(projectId) as { id: number; name: string; role: string }[];
+export async function getLinkedPeople(db: Client, projectId: number) {
+  const result = await db.execute({
+    sql: `SELECT p.id, p.name, p.role FROM people p
+          JOIN person_project_links l ON l.person_id = p.id
+          WHERE l.project_id = ?`,
+    args: [projectId],
+  });
+  return result.rows as unknown as { id: number; name: string; role: string }[];
 }
 
 // Helper to get linked opportunities for entity
-export function getLinkedOpportunities(db: Database.Database, entityType: string, entityId: number) {
+export async function getLinkedOpportunities(db: Client, entityType: string, entityId: number) {
   if (entityType === 'project') {
-    return db.prepare(`
-      SELECT o.id, o.name, o.category FROM opportunities o
-      JOIN project_opportunity_links l ON l.opportunity_id = o.id
-      WHERE l.project_id = ?
-    `).all(entityId) as { id: number; name: string; category: string }[];
+    const result = await db.execute({
+      sql: `SELECT o.id, o.name, o.category FROM opportunities o
+            JOIN project_opportunity_links l ON l.opportunity_id = o.id
+            WHERE l.project_id = ?`,
+      args: [entityId],
+    });
+    return result.rows as unknown as { id: number; name: string; category: string }[];
   }
   if (entityType === 'idea') {
-    return db.prepare(`
-      SELECT o.id, o.name, o.category FROM opportunities o
-      JOIN idea_opportunity_links l ON l.opportunity_id = o.id
-      WHERE l.idea_id = ?
-    `).all(entityId) as { id: number; name: string; category: string }[];
+    const result = await db.execute({
+      sql: `SELECT o.id, o.name, o.category FROM opportunities o
+            JOIN idea_opportunity_links l ON l.opportunity_id = o.id
+            WHERE l.idea_id = ?`,
+      args: [entityId],
+    });
+    return result.rows as unknown as { id: number; name: string; category: string }[];
   }
   return [];
 }
 
 // Helper to get linked people for an idea
-export function getLinkedPeopleForIdea(db: Database.Database, ideaId: number) {
-  return db.prepare(`
-    SELECT p.id, p.name, p.role FROM people p
-    JOIN person_idea_links l ON l.person_id = p.id
-    WHERE l.idea_id = ?
-  `).all(ideaId) as { id: number; name: string; role: string }[];
+export async function getLinkedPeopleForIdea(db: Client, ideaId: number) {
+  const result = await db.execute({
+    sql: `SELECT p.id, p.name, p.role FROM people p
+          JOIN person_idea_links l ON l.person_id = p.id
+          WHERE l.idea_id = ?`,
+    args: [ideaId],
+  });
+  return result.rows as unknown as { id: number; name: string; role: string }[];
 }

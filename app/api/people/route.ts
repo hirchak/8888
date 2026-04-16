@@ -9,19 +9,24 @@ export async function GET(req: NextRequest) {
 
     let rows;
     if (search) {
-      rows = db.prepare(
-        "SELECT * FROM people WHERE name LIKE ? OR expertise LIKE ? OR role LIKE ? ORDER BY updated_at DESC"
-      ).all(`%${search}%`, `%${search}%`, `%${search}%`);
+      const result = await db.execute({
+        sql: "SELECT * FROM people WHERE name LIKE ? OR expertise LIKE ? OR role LIKE ? ORDER BY updated_at DESC",
+        args: [`%${search}%`, `%${search}%`, `%${search}%`],
+      });
+      rows = result.rows;
     } else {
-      rows = db.prepare("SELECT * FROM people ORDER BY updated_at DESC").all();
+      const result = await db.execute("SELECT * FROM people ORDER BY updated_at DESC");
+      rows = result.rows;
     }
 
-    const result = rows.map((row: any) => {
-      const person = { ...row };
-      person.projects = getLinkedProjects(db, person.id);
-      person.ideas = getLinkedIdeas(db, person.id);
-      return person;
-    });
+    const result = await Promise.all(
+      (rows as any[]).map(async (row: any) => {
+        const person = { ...row };
+        person.projects = await getLinkedProjects(db, person.id);
+        person.ideas = await getLinkedIdeas(db, person.id);
+        return person;
+      })
+    );
 
     return NextResponse.json(result);
   } catch (e: any) {
@@ -35,25 +40,30 @@ export async function POST(req: NextRequest) {
     const db = getDb();
     const now = new Date().toISOString();
 
-    const info = db.prepare(`
-      INSERT INTO people (name, role, expertise, company, contact, summary, interests, created_at, updated_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `).run(
-      data.name,
-      data.role || '',
-      data.expertise || '',
-      data.company || '',
-      data.contact || '',
-      data.summary || '',
-      data.interests || '',
-      now,
-      now
-    );
+    const info = await db.execute({
+      sql: `INSERT INTO people (name, role, expertise, company, contact, summary, interests, created_at, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      args: [
+        data.name,
+        data.role || '',
+        data.expertise || '',
+        data.company || '',
+        data.contact || '',
+        data.summary || '',
+        data.interests || '',
+        now,
+        now,
+      ],
+    });
 
-    const row: any = db.prepare("SELECT * FROM people WHERE id = ?").get(info.lastInsertRowid);
+    const rowResult = await db.execute({
+      sql: "SELECT * FROM people WHERE id = ?",
+      args: [info.lastInsertRowid],
+    });
+    const row = rowResult.rows[0] as any;
     const person = { ...row };
-    person.projects = getLinkedProjects(db, person.id);
-    person.ideas = getLinkedIdeas(db, person.id);
+    person.projects = await getLinkedProjects(db, person.id);
+    person.ideas = await getLinkedIdeas(db, person.id);
     return NextResponse.json(person, { status: 201 });
   } catch (e: any) {
     return NextResponse.json({ detail: e.message }, { status: 500 });

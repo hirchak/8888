@@ -5,7 +5,8 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
   try {
     const db = getDb();
     const id = Number(params.id);
-    const row: any = db.prepare("SELECT * FROM opportunities WHERE id = ?").get(id);
+    const rowResult = await db.execute({ sql: "SELECT * FROM opportunities WHERE id = ?", args: [id] });
+    const row = rowResult.rows[0] as any;
     if (!row) return NextResponse.json({ detail: 'Opportunity not found' }, { status: 404 });
     return NextResponse.json(row);
   } catch (e: any) {
@@ -19,11 +20,11 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
     const db = getDb();
     const id = Number(params.id);
 
-    const existing: any = db.prepare("SELECT id FROM opportunities WHERE id = ?").get(id);
-    if (!existing) return NextResponse.json({ detail: 'Opportunity not found' }, { status: 404 });
+    const existingResult = await db.execute({ sql: "SELECT id FROM opportunities WHERE id = ?", args: [id] });
+    if (existingResult.rows.length === 0) return NextResponse.json({ detail: 'Opportunity not found' }, { status: 404 });
 
     const fields: string[] = [];
-    const vals: any[] = [];
+    const vals: (string | number | null)[] = [];
     for (const key of ['name', 'description', 'category', 'source_type', 'source_person_id', 'source_project_id']) {
       if (data[key] !== undefined) {
         fields.push(`${key} = ?`);
@@ -34,11 +35,11 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
       fields.push('updated_at = ?');
       vals.push(new Date().toISOString());
       vals.push(id);
-      db.prepare(`UPDATE opportunities SET ${fields.join(', ')} WHERE id = ?`).run(...vals);
+      await db.execute({ sql: `UPDATE opportunities SET ${fields.join(', ')} WHERE id = ?`, args: vals });
     }
 
-    const row: any = db.prepare("SELECT * FROM opportunities WHERE id = ?").get(id);
-    return NextResponse.json(row);
+    const rowResult = await db.execute({ sql: "SELECT * FROM opportunities WHERE id = ?", args: [id] });
+    return NextResponse.json(rowResult.rows[0]);
   } catch (e: any) {
     return NextResponse.json({ detail: e.message }, { status: 500 });
   }
@@ -49,12 +50,12 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
     const db = getDb();
     const id = Number(params.id);
 
-    const existing: any = db.prepare("SELECT id FROM opportunities WHERE id = ?").get(id);
-    if (!existing) return NextResponse.json({ detail: 'Opportunity not found' }, { status: 404 });
+    const existingResult = await db.execute({ sql: "SELECT id FROM opportunities WHERE id = ?", args: [id] });
+    if (existingResult.rows.length === 0) return NextResponse.json({ detail: 'Opportunity not found' }, { status: 404 });
 
-    db.prepare("DELETE FROM idea_opportunity_links WHERE opportunity_id = ?").run(id);
-    db.prepare("DELETE FROM project_opportunity_links WHERE opportunity_id = ?").run(id);
-    db.prepare("DELETE FROM opportunities WHERE id = ?").run(id);
+    await db.execute({ sql: "DELETE FROM idea_opportunity_links WHERE opportunity_id = ?", args: [id] });
+    await db.execute({ sql: "DELETE FROM project_opportunity_links WHERE opportunity_id = ?", args: [id] });
+    await db.execute({ sql: "DELETE FROM opportunities WHERE id = ?", args: [id] });
     return NextResponse.json({ ok: true });
   } catch (e: any) {
     return NextResponse.json({ detail: e.message }, { status: 500 });

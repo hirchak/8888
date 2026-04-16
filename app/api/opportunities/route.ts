@@ -9,11 +9,14 @@ export async function GET(req: NextRequest) {
 
     let rows;
     if (search) {
-      rows = db.prepare(
-        "SELECT * FROM opportunities WHERE name LIKE ? OR description LIKE ? OR category LIKE ? ORDER BY updated_at DESC"
-      ).all(`%${search}%`, `%${search}%`, `%${search}%`);
+      const result = await db.execute({
+        sql: "SELECT * FROM opportunities WHERE name LIKE ? OR description LIKE ? OR category LIKE ? ORDER BY updated_at DESC",
+        args: [`%${search}%`, `%${search}%`, `%${search}%`],
+      });
+      rows = result.rows;
     } else {
-      rows = db.prepare("SELECT * FROM opportunities ORDER BY updated_at DESC").all();
+      const result = await db.execute("SELECT * FROM opportunities ORDER BY updated_at DESC");
+      rows = result.rows;
     }
 
     return NextResponse.json(rows);
@@ -28,22 +31,26 @@ export async function POST(req: NextRequest) {
     const db = getDb();
     const now = new Date().toISOString();
 
-    const info = db.prepare(`
-      INSERT INTO opportunities (name, description, category, source_type, source_person_id, source_project_id, created_at, updated_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    `).run(
-      data.name,
-      data.description || '',
-      data.category || '',
-      data.source_type || 'external',
-      data.source_person_id ?? null,
-      data.source_project_id ?? null,
-      now,
-      now
-    );
+    const info = await db.execute({
+      sql: `INSERT INTO opportunities (name, description, category, source_type, source_person_id, source_project_id, created_at, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      args: [
+        data.name,
+        data.description || '',
+        data.category || '',
+        data.source_type || 'external',
+        data.source_person_id ?? null,
+        data.source_project_id ?? null,
+        now,
+        now,
+      ],
+    });
 
-    const row: any = db.prepare("SELECT * FROM opportunities WHERE id = ?").get(info.lastInsertRowid);
-    return NextResponse.json(row, { status: 201 });
+    const rowResult = await db.execute({
+      sql: "SELECT * FROM opportunities WHERE id = ?",
+      args: [info.lastInsertRowid],
+    });
+    return NextResponse.json(rowResult.rows[0], { status: 201 });
   } catch (e: any) {
     return NextResponse.json({ detail: e.message }, { status: 500 });
   }

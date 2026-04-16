@@ -26,7 +26,10 @@ export async function POST(req: NextRequest) {
     const db = getDb();
     const [table, colA, colB] = linkDef;
 
-    db.prepare(`INSERT OR IGNORE INTO ${table} (${colA}, ${colB}) VALUES (?, ?)`).run(data.source_id, data.target_id);
+    await db.execute({
+      sql: `INSERT OR IGNORE INTO ${table} (${colA}, ${colB}) VALUES (?, ?)`,
+      args: [data.source_id, data.target_id],
+    });
     return NextResponse.json({ ok: true }, { status: 201 });
   } catch (e: any) {
     return NextResponse.json({ detail: e.message }, { status: 500 });
@@ -46,7 +49,10 @@ export async function DELETE(req: NextRequest) {
     const db = getDb();
     const [table, colA, colB] = linkDef;
 
-    db.prepare(`DELETE FROM ${table} WHERE ${colA} = ? AND ${colB} = ?`).run(data.source_id, data.target_id);
+    await db.execute({
+      sql: `DELETE FROM ${table} WHERE ${colA} = ? AND ${colB} = ?`,
+      args: [data.source_id, data.target_id],
+    });
     return NextResponse.json({ ok: true });
   } catch (e: any) {
     return NextResponse.json({ detail: e.message }, { status: 500 });

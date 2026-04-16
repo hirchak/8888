@@ -9,19 +9,24 @@ export async function GET(req: NextRequest) {
 
     let rows;
     if (search) {
-      rows = db.prepare(
-        "SELECT * FROM ideas WHERE name LIKE ? OR pitch LIKE ? ORDER BY updated_at DESC"
-      ).all(`%${search}%`, `%${search}%`);
+      const result = await db.execute({
+        sql: "SELECT * FROM ideas WHERE name LIKE ? OR pitch LIKE ? ORDER BY updated_at DESC",
+        args: [`%${search}%`, `%${search}%`],
+      });
+      rows = result.rows;
     } else {
-      rows = db.prepare("SELECT * FROM ideas ORDER BY updated_at DESC").all();
+      const result = await db.execute("SELECT * FROM ideas ORDER BY updated_at DESC");
+      rows = result.rows;
     }
 
-    const result = rows.map((row: any) => {
-      const idea = { ...row };
-      idea.people = getLinkedPeopleForIdea(db, idea.id);
-      idea.opportunities = getLinkedOpportunities(db, 'idea', idea.id);
-      return idea;
-    });
+    const result = await Promise.all(
+      (rows as any[]).map(async (row: any) => {
+        const idea = { ...row };
+        idea.people = await getLinkedPeopleForIdea(db, idea.id);
+        idea.opportunities = await getLinkedOpportunities(db, 'idea', idea.id);
+        return idea;
+      })
+    );
 
     return NextResponse.json(result);
   } catch (e: any) {
@@ -35,26 +40,31 @@ export async function POST(req: NextRequest) {
     const db = getDb();
     const now = new Date().toISOString();
 
-    const info = db.prepare(`
-      INSERT INTO ideas (name, pitch, roi, origin, author, requirements, matched_assets, status, created_at, updated_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `).run(
-      data.name,
-      data.pitch || '',
-      data.roi || '',
-      data.origin || '',
-      data.author || '',
-      data.requirements || '',
-      data.matched_assets || '',
-      data.status || 'Hypothesis',
-      now,
-      now
-    );
+    const info = await db.execute({
+      sql: `INSERT INTO ideas (name, pitch, roi, origin, author, requirements, matched_assets, status, created_at, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      args: [
+        data.name,
+        data.pitch || '',
+        data.roi || '',
+        data.origin || '',
+        data.author || '',
+        data.requirements || '',
+        data.matched_assets || '',
+        data.status || 'Hypothesis',
+        now,
+        now,
+      ],
+    });
 
-    const row: any = db.prepare("SELECT * FROM ideas WHERE id = ?").get(info.lastInsertRowid);
+    const rowResult = await db.execute({
+      sql: "SELECT * FROM ideas WHERE id = ?",
+      args: [info.lastInsertRowid],
+    });
+    const row = rowResult.rows[0] as any;
     const idea = { ...row };
-    idea.people = getLinkedPeopleForIdea(db, idea.id);
-    idea.opportunities = getLinkedOpportunities(db, 'idea', idea.id);
+    idea.people = await getLinkedPeopleForIdea(db, idea.id);
+    idea.opportunities = await getLinkedOpportunities(db, 'idea', idea.id);
     return NextResponse.json(idea, { status: 201 });
   } catch (e: any) {
     return NextResponse.json({ detail: e.message }, { status: 500 });
