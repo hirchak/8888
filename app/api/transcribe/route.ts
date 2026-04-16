@@ -2,6 +2,8 @@ import { writeFile, mkdir } from 'fs/promises';
 import { existsSync } from 'fs';
 import { spawn } from 'child_process';
 
+export const runtime = 'nodejs';
+
 export async function POST(request: Request) {
   const formData = await request.formData();
   const audio = formData.get('audio') as Blob;
@@ -10,8 +12,9 @@ export async function POST(request: Request) {
   if (!existsSync(dir)) await mkdir(dir, { recursive: true });
   const filePath = `${dir}/${Date.now()}.ogg`;
 
-  const buffer = Buffer.from(await audio.arrayBuffer());
-  await writeFile(filePath, buffer);
+  const arrayBuffer = await audio.arrayBuffer();
+  const uint8 = new Uint8Array(arrayBuffer);
+  await writeFile(filePath, uint8);
 
   const result = await new Promise<string>((resolve, reject) => {
     const proc = spawn('whisper', [filePath, '--model', 'small', '--language', 'Ukrainian', '--output-format', 'json']);
