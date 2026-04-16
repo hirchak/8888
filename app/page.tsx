@@ -4,6 +4,7 @@ import { useEffect, useState, Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { api } from '@/lib/api';
+import DashboardInsights from '@/components/DashboardInsights';
 
 const IDEA_STAGES = {
   'Hypothesis': { label: 'Гіпотеза', color: 'bg-amber-900/50 text-amber-300 border border-amber-800/40' },
@@ -214,6 +215,9 @@ function DashboardInner() {
           </div>
         </section>
       )}
+
+      {/* Dashboard Insights */}
+      {!filtered && <DashboardInsights />}
 
       {/* Idea pipeline */}
       {!filtered && stats && Object.keys(stats.idea_stages || {}).length > 0 && (
