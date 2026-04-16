@@ -1,4 +1,5 @@
 'use client';
+import '../app/globals.css';
 
 import { Suspense } from 'react';
 import { Logo, NavLinks } from './Header';
