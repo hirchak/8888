@@ -35,3 +35,6 @@ next-env.d.ts
 # local sqlite
 nexus.db
 *.db
+
+# local leads data
+/data/leads.json

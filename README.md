@@ -53,6 +53,7 @@ npm run build      # Production build
 | GET/POST | `/api/opportunities` | List / create opportunities |
 | GET/PUT/DELETE | `/api/opportunities/{id}` | Read / update / delete opportunity |
 | POST/DELETE | `/api/links` | Bi-directional links |
+| GET/POST | `/api/leads` | Email capture leads (local `/data/leads.json`) |
 
 ## 🧩 Сутності
 

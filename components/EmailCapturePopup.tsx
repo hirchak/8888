@@ -57,7 +57,12 @@ export default function EmailCapturePopup() {
       setError('Введіть коректний email');
       return;
     }
-    console.log('[EmailCapture] Email submitted:', email);
+    // POST to leads API
+    fetch('/api/leads', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, source: 'email-capture-popup' })
+    }).catch(console.error);
     localStorage.setItem('nexus_user_email', email);
     localStorage.setItem(STORAGE_KEY, 'true');
     setSubmitted(true);
