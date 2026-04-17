@@ -171,7 +171,7 @@ function BadgeCard({ badge, glowing }: { badge: Badge; glowing?: boolean }) {
         {badge.description}
       </div>
       {badge.unlocked && badge.unlockedAt && (
-        <div className="text-[10px] text-zinc-600 mt-2">
+        <div className="text-[10px] text-zinc-600 mt-2 truncate">
           {new Date(badge.unlockedAt).toLocaleDateString('uk-UA')}
         </div>
       )}

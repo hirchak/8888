@@ -32,18 +32,18 @@ function StatCard({ href, icon, label, count, accent, delay = 0 }) {
   return (
     <Link
       href={href}
-      className="cyber-card group relative overflow-hidden"
+      className="cyber-card group relative overflow-hidden min-w-0"
       style={{ animationDelay: `${delay}ms` }}
     >
       {/* Glow orb */}
       <div className={`absolute -top-4 -right-4 w-24 h-24 rounded-full blur-2xl opacity-0 group-hover:opacity-20 transition-opacity duration-500 ${accent}`} />
-      <div className="flex items-center justify-between mb-4 relative">
-        <div className={`w-11 h-11 rounded-xl flex items-center justify-center ${accent}`}>
+      <div className="flex items-center justify-between mb-4 relative min-w-0">
+        <div className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 ${accent}`}>
           {icon}
         </div>
-        <span className="text-4xl font-bold text-zinc-100 group-hover:text-white transition-colors duration-200">{count ?? '—'}</span>
+        <span className="text-4xl font-bold text-zinc-100 group-hover:text-white transition-colors duration-200 text-right shrink-0">{count ?? '—'}</span>
       </div>
-      <div className="text-sm font-medium text-zinc-400 group-hover:text-zinc-200 transition-colors duration-200 tracking-wide">{label}</div>
+      <div className="text-sm font-medium text-zinc-400 group-hover:text-zinc-200 transition-colors duration-200 tracking-wide truncate">{label}</div>
     </Link>
   );
 }
@@ -67,7 +67,7 @@ function EntityCard({ href, name, sub, tags, stageLabel, stageColor, createdAt, 
     : '';
 
   return (
-    <Link href={href} className="cyber-card group block relative">
+    <Link href={href} className="cyber-card group block relative overflow-hidden">
       {/* Edit button (top-right corner) */}
       <Link
         href={href}
@@ -77,8 +77,8 @@ function EntityCard({ href, name, sub, tags, stageLabel, stageColor, createdAt, 
         ✏️
       </Link>
 
-      <div className="flex items-start justify-between gap-2 mb-2 pr-8">
-        <div className="font-semibold text-zinc-100 truncate group-hover:text-white transition-colors duration-200">{name}</div>
+      <div className="flex items-start justify-between gap-2 mb-2 pr-8 min-w-0">
+        <div className="font-semibold text-zinc-100 truncate group-hover:text-white transition-colors duration-200 min-w-0">{name}</div>
         {stageLabel && <span className={`tag shrink-0 text-xs ${stageColor}`}>{stageLabel}</span>}
       </div>
       <div className="text-sm text-zinc-500 truncate mb-3">{sub || '—'}</div>
