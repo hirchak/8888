@@ -108,7 +108,7 @@ export function NavLinks() {
             className="fixed inset-0 bg-black/70 backdrop-blur-md z-40 md:hidden"
             onClick={() => setOpen(false)}
           />
-          <div className="fixed top-0 right-0 bottom-0 w-72 bg-zinc-950 border-l border-zinc-800/80 z-50 md:hidden flex flex-col pt-20 px-4 pb-6 gap-1 shadow-2xl backdrop-blur-xl">
+          <div className="fixed top-0 right-0 bottom-0 w-72 bg-zinc-950 border-l border-zinc-800/80 z-50 md:hidden flex flex-col pt-20 px-4 pb-6 gap-1 shadow-2xl">
             <button
               type="button"
               className="absolute top-4 right-4 p-2 text-zinc-400 hover:text-zinc-200"
