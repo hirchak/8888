@@ -5,6 +5,7 @@ import { Suspense } from 'react';
 import { Logo, NavLinks } from './Header';
 import SearchForm from './SearchForm';
 import OnboardingTour from './OnboardingTour';
+import ThemeToggle from './ThemeToggle';
 
 export default function Layout({ children }) {
   return (
@@ -15,7 +16,10 @@ export default function Layout({ children }) {
           <Suspense fallback={<div className="flex-1 max-w-sm bg-zinc-800/80 rounded-xl h-9 animate-pulse" />}>
             <SearchForm />
           </Suspense>
-          <NavLinks />
+          <div className="flex items-center gap-1">
+            <ThemeToggle />
+            <NavLinks />
+          </div>
         </div>
       </header>
       <main className="flex-1 max-w-6xl mx-auto w-full px-4 py-6">

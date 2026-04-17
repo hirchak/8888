@@ -1,5 +1,6 @@
 import { Plus_Jakarta_Sans } from 'next/font/google';
 import Layout from '@/components/Layout';
+import ThemeScript from '@/components/ThemeScript';
 
 const font = Plus_Jakarta_Sans({
   subsets: ['latin', 'cyrillic-ext', 'latin-ext'],
@@ -15,7 +16,10 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="uk" className={font.variable}>
+    <html lang="uk" className={font.variable} suppressHydrationWarning>
+      <head>
+        <ThemeScript />
+      </head>
       <body>
         <Layout>{children}</Layout>
       </body>

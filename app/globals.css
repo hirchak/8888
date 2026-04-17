@@ -290,3 +290,103 @@
   background: rgba(255,255,255,0.02);
   border: 1px solid rgba(255,255,255,0.04);
 }
+
+/* ── Light Mode Overrides ─────────────────────────────────── */
+html.light {
+  background-color: #f4f4f5;
+  color: #18181b;
+}
+
+html.light body {
+  background-color: #f4f4f5;
+  color: #18181b;
+}
+
+/* Header */
+html.light header {
+  background-color: rgba(255, 255, 255, 0.9) !important;
+  border-color: #e4e4e7 !important;
+}
+
+/* Cards */
+html.light .card,
+html.light .cyber-card,
+html.light .founder-card {
+  background-color: #ffffff !important;
+  border-color: #e4e4e7 !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08), 0 0 0 1px rgba(0,0,0,0.03) inset !important;
+}
+
+/* Nav links */
+html.light .nav-link-active {
+  background-color: #f4f4f5 !important;
+  color: #18181b !important;
+}
+html.light .nav-link-inactive {
+  color: #71717a !important;
+}
+html.light .nav-link-inactive:hover {
+  background-color: #f4f4f5 !important;
+  color: #18181b !important;
+}
+
+/* Input fields */
+html.light .input-field {
+  background-color: #f4f4f5 !important;
+  border-color: #d4d4d8 !important;
+  color: #18181b !important;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05) inset !important;
+}
+html.light .input-field::placeholder {
+  color: #a1a1aa !important;
+}
+html.light .input-field:focus {
+  border-color: #7c3aed !important;
+}
+
+/* Buttons */
+html.light .btn-primary {
+  background-color: #7c3aed !important;
+}
+html.light .btn-secondary {
+  background-color: #f4f4f5 !important;
+  border-color: #d4d4d8 !important;
+  color: #27272a !important;
+}
+html.light .btn-ghost {
+  color: #71717a !important;
+}
+html.light .btn-ghost:hover {
+  background-color: #f4f4f5 !important;
+  color: #18181b !important;
+}
+
+/* Text colors */
+html.light .text-zinc-100,
+html.light .text-zinc-200,
+html.light .text-zinc-300,
+html.light .text-zinc-400 {
+  color: inherit !important;
+}
+
+/* Labels */
+html.light .label {
+  color: #52525b !important;
+}
+
+/* Links */
+html.light a {
+  color: #7c3aed;
+}
+
+/* Progress dots, spinners, etc. */
+html.light .spinner {
+  border-color: #d4d4d8 !important;
+  border-top-color: #7c3aed !important;
+}
+
+/* Onboarding tour modal */
+html.light .cyber-card {
+  background-color: #ffffff !important;
+  border-color: #e4e4e7 !important;
+}
