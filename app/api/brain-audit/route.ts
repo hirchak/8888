@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+const GROQ_API_KEY = process.env.GROQ_API_KEY;
+const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
+
 export async function POST(request: NextRequest) {
   const { text } = await request.json();
 
@@ -10,12 +13,72 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  // Use Groq AI for parsing if key is available
+  if (GROQ_API_KEY) {
+    try {
+      const response = await fetch(GROQ_URL, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${GROQ_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'llama-3.3-70b-versatile',
+          messages: [
+            {
+              role: 'system',
+              content: `Ти AI-парсер для платформи AI Nexus. З тексту витягни всіх людей, проєкти, ідеї, можливості. Відповідь ТІЛЬКИ у форматі JSON: {"entities": [{"type": "person|project|idea|opportunity", "name": "...", "confidence": 0.0-1.0}, ...]}. Типи: person (людина), project (проєкт/стартап), idea (ідея/концепція), opportunity (можливість/грант/інвестиція).`
+            },
+            {
+              role: 'user',
+              content: `Знайди всі сутності в цьому тексті: "${text}"`
+            }
+          ],
+          temperature: 0.3,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Groq API error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      const content = data.choices?.[0]?.message?.content || '';
+      
+      // Parse JSON from response
+      let parsed = { entities: [] };
+      try {
+        const jsonMatch = content.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          parsed = JSON.parse(jsonMatch[0]);
+        }
+      } catch {
+        // Fallback to rule-based if AI parsing fails
+      }
+
+      if (parsed.entities && parsed.entities.length > 0) {
+        return NextResponse.json({
+          entities: parsed.entities,
+          summary: {
+            total: parsed.entities.length,
+            people: parsed.entities.filter((e: any) => e.type === 'person').length,
+            projects: parsed.entities.filter((e: any) => e.type === 'project').length,
+            ideas: parsed.entities.filter((e: any) => e.type === 'idea').length,
+            opportunities: parsed.entities.filter((e: any) => e.type === 'opportunity').length,
+          },
+        });
+      }
+    } catch (error) {
+      console.error('Groq AI parsing failed, falling back to rule-based:', error);
+      // Fall through to rule-based below
+    }
+  }
+
+  // ── Rule-based fallback ──────────────────────────────────────
   const entities: any[] = [];
 
   // ── People ──────────────────────────────────────────────────
-  // Full name patterns (capitalized words, 1-3 words)
   const namePattern = /\b([А-ЯІЇЄҐ][а-яіїєя']+(?:\s+[А-ЯІЇЄҐ][а-яіїєя']+){0,2})\b/g;
-  // Context clues for people
   const peopleContext = [
     /(?:зустрів|знайомий|знайома|працює|працюю|колега|друг|знайшов|рекомендує|контакт|зв'язатись|пишу|написав|написала|додав|додала)\s+([А-ЯІЇЄҐ][а-яіїєя]+(?:\s+[А-ЯІЇЄҐ][а-яіїєя]+){0,2})/gi,
     /(?:CEO|CTO|CFO|COO|Founder|Co-founder|VP|Lead|Manager|Директор|менеджер|розробник|дизайнер|маркетолог|юрист|бухгалтер|аналітик|консультант)\s+([А-ЯІЇЄҐ][а-яіїєя]+(?:\s+[А-ЯІЇЄҐ][а-яіїєя]+)?)/gi,
@@ -34,7 +97,6 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  // Standalone capitalized names that look like people (not company names)
   const allNames = text.match(namePattern) || [];
   for (const name of allNames) {
     if (
@@ -65,7 +127,6 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  // Standalone project names in quotes
   const quotedProjectMatches = text.matchAll(/["'«]([А-ЯІЇЄҐа-яіїєя\d\s]{3,30})["'»]/g);
   for (const match of quotedProjectMatches) {
     const name = match[1].trim();
