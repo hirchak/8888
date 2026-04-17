@@ -83,6 +83,13 @@ export function NavLinks() {
         <span className="hidden lg:inline">Задачі</span>
       </Link>
       <Link
+        href="/brain-audit"
+        className={`nav-link ${pathname === '/brain-audit' ? 'nav-link-active' : 'nav-link-inactive'}`}
+      >
+        <span className="text-base">🧠</span>
+        <span className="hidden lg:inline">Brain Audit</span>
+      </Link>
+      <Link
         href="/voice"
         className={`nav-link ${pathname === '/voice' ? 'nav-link-active' : 'nav-link-inactive'}`}
       >
