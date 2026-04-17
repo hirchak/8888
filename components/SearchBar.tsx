@@ -113,7 +113,7 @@ export default function SearchBar() {
   }
 
   return (
-    <div ref={containerRef} className="relative w-full max-w-xs">
+    <div ref={containerRef} className="relative w-full w-full sm:max-w-xs">
       <div className="relative">
         <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
           {loading ? (

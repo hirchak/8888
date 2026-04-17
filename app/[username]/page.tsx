@@ -196,7 +196,7 @@ export default function PublicProfilePage() {
         <div className="absolute top-10 left-1/3 w-64 h-32 rounded-full bg-violet-500/10 blur-3xl" />
 
         {/* Avatar */}
-        <div className="w-24 h-24 mx-auto mb-5 rounded-2xl bg-gradient-to-br from-cyan-500 to-violet-600 flex items-center justify-center text-4xl font-bold text-white shadow-2xl shadow-cyan-900/30">
+        <div className="w-16 h-16 sm:w-20 md:w-24 mx-auto mb-4 sm:mb-5 rounded-2xl bg-gradient-to-br from-cyan-500 to-violet-600 flex items-center justify-center text-3xl sm:text-4xl font-bold text-white shadow-2xl shadow-cyan-900/30">
           {displayName[0].toUpperCase()}
         </div>
 

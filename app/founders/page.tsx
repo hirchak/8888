@@ -35,7 +35,7 @@ function FounderCard({ founder, index }) {
       <div className={`absolute -top-8 left-1/2 -translate-x-1/2 w-48 h-48 rounded-full blur-3xl opacity-0 group-hover:opacity-15 transition-opacity duration-700 bg-gradient-to-b ${founder.gradientFrom} to-transparent`} />
 
       {/* Avatar */}
-      <div className={`w-24 h-24 mx-auto mb-5 rounded-2xl bg-gradient-to-br ${founder.gradientFrom} ${founder.gradientTo} flex items-center justify-center text-4xl font-bold text-white shadow-xl`}>
+      <div className={`w-16 h-16 sm:w-20 md:w-24 mx-auto mb-4 sm:mb-5 rounded-2xl bg-gradient-to-br ${founder.gradientFrom} ${founder.gradientTo} flex items-center justify-center text-3xl sm:text-4xl font-bold text-white shadow-xl`}>
         {founder.name[0]}
       </div>
 
@@ -107,7 +107,7 @@ export default function FoundersPage() {
     <div className="max-w-5xl mx-auto">
       {/* Hero */}
       <div className="hero-gradient rounded-2xl p-8 mb-10 text-center">
-        <h1 className="text-3xl font-bold text-white mb-2">Команда AI Nexus</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2 leading-tight">Команда AI Nexus</h1>
         <p className="text-zinc-400 text-sm">Два фаундери, одна місія — будувати етичну AI-екосистему</p>
       </div>
 

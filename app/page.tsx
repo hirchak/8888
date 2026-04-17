@@ -221,7 +221,7 @@ function DashboardInner() {
       {/* Hero gradient bar */}
       {!filtered && (
         <div className="hero-gradient rounded-2xl p-6 mb-2">
-          <h1 className="text-2xl font-bold text-white mb-1">AI Nexus Platform</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-white mb-1 leading-tight">AI Nexus Platform</h1>
           <p className="text-zinc-400 text-sm">Ваш другий мозок для фаундерів</p>
         </div>
       )}

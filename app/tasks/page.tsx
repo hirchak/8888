@@ -70,7 +70,7 @@ function TaskModal({ onClose, onSave, initial }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative cyber-card w-full max-w-md p-6">
+      <div className="relative cyber-card w-full max-w-md max-w-sm mx-4 p-4 sm:p-6">
         <h3 className="text-lg font-semibold text-white mb-5">
           {initial ? '✏️ Редагувати задачу' : '📅 Нова задача'}
         </h3>

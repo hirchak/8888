@@ -9,6 +9,10 @@
     @apply bg-[#09090b] text-zinc-100 antialiased;
     font-family: var(--font-jakarta), 'Plus Jakarta Sans', system-ui, sans-serif;
     scroll-behavior: smooth;
+    overflow-x: hidden;
+  }
+  body {
+    overflow-x: hidden;
   }
 
   /* Custom scrollbar */

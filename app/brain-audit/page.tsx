@@ -151,7 +151,7 @@ export default function BrainAuditPage() {
           <span>🧠</span>
           <span>AI Brain Audit</span>
         </div>
-        <h1 className="text-3xl md:text-4xl font-bold text-white">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white leading-tight">
           Дізнайтеся, що ховається у вашому тексті
         </h1>
         <p className="text-zinc-400 text-lg max-w-2xl mx-auto">

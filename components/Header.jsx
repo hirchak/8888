@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useState } from 'react';
 
 function NexusIcon() {
   return (
@@ -42,60 +43,95 @@ export function Logo() {
       <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-cyan-600 to-violet-600 flex items-center justify-center transition-all duration-300 group-hover:shadow-lg group-hover:shadow-cyan-600/30 group-hover:scale-105">
         <NexusIcon />
       </div>
-      <span className="font-bold text-base tracking-tight hidden sm:block text-zinc-100 group-hover:text-white transition-colors duration-200">
+      <span className="font-bold text-base tracking-tight text-zinc-100 group-hover:text-white transition-colors duration-200">
         AI Nexus
       </span>
     </Link>
   );
 }
 
+const NAV_ITEMS = [
+  { href: '/', icon: <GridIcon />, label: 'Дашборд', hideOn: 'sm' },
+  { href: '/founders', icon: <span className="text-base">⚡</span>, label: 'Фаундери', hideOn: 'lg' },
+  { href: '/add', icon: <PlusIcon />, label: 'Додати', hideOn: 'sm' },
+  { href: '/tasks', icon: <span className="text-base">📅</span>, label: 'Задачі', hideOn: 'lg' },
+  { href: '/brain-audit', icon: <span className="text-base">🧠</span>, label: 'Brain Audit', hideOn: 'lg' },
+  { href: '/voice', icon: <span className="text-base">🎤</span>, label: 'Голос', hideOn: 'lg' },
+];
+
 export function NavLinks() {
   const pathname = usePathname();
+  const [open, setOpen] = useState(false);
+
+  function isActive(href) {
+    return pathname === href;
+  }
 
   return (
-    <nav className="flex items-center gap-1">
-      <Link
-        href="/"
-        className={`nav-link ${pathname === '/' ? 'nav-link-active' : 'nav-link-inactive'}`}
+    <>
+      {/* Desktop nav */}
+      <nav className="hidden md:flex items-center gap-1">
+        {NAV_ITEMS.map(item => (
+          <Link
+            key={item.href}
+            href={item.href}
+            className={`nav-link ${isActive(item.href) ? 'nav-link-active' : 'nav-link-inactive'}`}
+          >
+            {item.icon}
+            <span>{item.label}</span>
+          </Link>
+        ))}
+      </nav>
+
+      {/* Mobile hamburger */}
+      <button
+        type="button"
+        className="md:hidden p-2 rounded-xl text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/80 transition-colors"
+        onClick={() => setOpen(!open)}
+        aria-label="Меню"
       >
-        <GridIcon />
-        <span className="hidden sm:inline">Дашборд</span>
-      </Link>
-      <Link
-        href="/founders"
-        className={`nav-link ${pathname === '/founders' ? 'nav-link-active' : 'nav-link-inactive'}`}
-      >
-        <span className="text-base">⚡</span>
-        <span className="hidden lg:inline">Фаундери</span>
-      </Link>
-      <Link
-        href="/add"
-        className={`nav-link ${pathname === '/add' ? 'nav-link-active' : 'nav-link-inactive'}`}
-      >
-        <PlusIcon />
-        <span className="hidden sm:inline">Додати</span>
-      </Link>
-      <Link
-        href="/tasks"
-        className={`nav-link ${pathname === '/tasks' ? 'nav-link-active' : 'nav-link-inactive'}`}
-      >
-        <span className="text-base">📅</span>
-        <span className="hidden lg:inline">Задачі</span>
-      </Link>
-      <Link
-        href="/brain-audit"
-        className={`nav-link ${pathname === '/brain-audit' ? 'nav-link-active' : 'nav-link-inactive'}`}
-      >
-        <span className="text-base">🧠</span>
-        <span className="hidden lg:inline">Brain Audit</span>
-      </Link>
-      <Link
-        href="/voice"
-        className={`nav-link ${pathname === '/voice' ? 'nav-link-active' : 'nav-link-inactive'}`}
-      >
-        <span className="text-base">🎤</span>
-        <span className="hidden lg:inline">Голос</span>
-      </Link>
-    </nav>
+        {open ? (
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M4 4l12 12M16 4L4 16" strokeLinecap="round"/>
+          </svg>
+        ) : (
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M3 6h14M3 10h14M3 14h14" strokeLinecap="round"/>
+          </svg>
+        )}
+      </button>
+
+      {/* Mobile menu drawer */}
+      {open && (
+        <>
+          <div
+            className="fixed inset-0 bg-black/50 z-40 md:hidden"
+            onClick={() => setOpen(false)}
+          />
+          <div className="fixed top-0 right-0 bottom-0 w-64 bg-zinc-950 border-l border-zinc-800/80 z-50 md:hidden flex flex-col pt-20 px-4 pb-6 gap-1 shadow-2xl">
+            <button
+              type="button"
+              className="absolute top-4 right-4 p-2 text-zinc-400 hover:text-zinc-200"
+              onClick={() => setOpen(false)}
+            >
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M4 4l12 12M16 4L4 16" strokeLinecap="round"/>
+              </svg>
+            </button>
+            {NAV_ITEMS.map(item => (
+              <Link
+                key={item.href}
+                href={item.href}
+                onClick={() => setOpen(false)}
+                className={`nav-link ${isActive(item.href) ? 'nav-link-active' : 'nav-link-inactive'}`}
+              >
+                {item.icon}
+                <span>{item.label}</span>
+              </Link>
+            ))}
+          </div>
+        </>
+      )}
+    </>
   );
 }
