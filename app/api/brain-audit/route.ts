@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
           messages: [
             {
               role: 'system',
-              content: `Ти AI-парсер для платформи AI Nexus. З тексту витягни всіх людей, проєкти, ідеї, можливості. Відповідь ТІЛЬКИ у форматі JSON: {"entities": [{"type": "person|project|idea|opportunity", "name": "...", "confidence": 0.0-1.0}, ...]}. Типи: person (людина), project (проєкт/стартап), idea (ідея/концепція), opportunity (можливість/грант/інвестиція).`
+              content: `Ти AI-парсер для платформи AI Nexus. З тексту витягни всіх людей, проєкти, ідеї, можливості. Відповідь ТІЛЬКИ у форматі JSON (без будь-якого іншого тексту): {"entities": [{"type": "person", "name": "Ім'я людини", "confidence": 0.9}, {"type": "project", "name": "Назва проєкту", "confidence": 0.8}]}. Типи: person, project, idea, opportunity. Якщо нічого не знайдено — {"entities": []}`
             },
             {
               role: 'user',
