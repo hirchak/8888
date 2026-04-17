@@ -6,6 +6,7 @@ import { useSearchParams } from 'next/navigation';
 import { api } from '@/lib/api';
 import DashboardInsights from '@/components/DashboardInsights';
 import DeadCapital from '@/components/DeadCapital';
+import EmailCapturePopup from '@/components/EmailCapturePopup';
 
 const IDEA_STAGES = {
   'Hypothesis': { label: 'Гіпотеза', color: 'bg-amber-900/50 text-amber-300 border border-amber-800/40' },
@@ -409,8 +410,11 @@ function DashboardInner() {
 
 export default function DashboardPage() {
   return (
-    <Suspense fallback={<div className="flex justify-center py-24"><div className="spinner" /></div>}>
-      <DashboardInner />
-    </Suspense>
+    <>
+      <Suspense fallback={<div className="flex justify-center py-24"><div className="spinner" /></div>}>
+        <DashboardInner />
+      </Suspense>
+      <EmailCapturePopup />
+    </>
   );
 }
