@@ -30,6 +30,85 @@ function Field({ label, value, onChange, type = 'text', placeholder, required = 
   );
 }
 
+// ── Sample Data ─────────────────────────────────────────────
+async function loadSampleData() {
+  const created = [];
+
+  const p1 = await api.createPerson({ name: 'Андрій Пиха', role: 'Партнер', expertise: 'Marketing, Sales', company: 'SEO-Open', contact: '@andrisav', summary: 'Партнер та маркетинг-спеціаліст, Prague', interests: 'marketing, ai, automation', tags: 'partner, marketing' });
+  created.push(p1);
+  const p2 = await api.createPerson({ name: 'Юрій @Hirchak', role: 'Фаундер', expertise: 'AI, Full-stack', company: 'AI Nexus', contact: '@Hirchak', summary: 'Фаундер платформи AI Nexus, Warsaw', interests: 'ai, platform, saas', tags: 'founder, developer' });
+  created.push(p2);
+  const p3 = await api.createPerson({ name: 'Маркіян К.', role: 'Юрист', expertise: 'IT Law, Contracts', company: 'Юрфірма', contact: 'markiyan@example.com', summary: 'Юрист з досвідом у IT-праві, Київ', interests: 'law, it, contracts', tags: 'lawyer, legal' });
+  created.push(p3);
+
+  const proj1 = await api.createProject({ name: 'SEO-Open', description: 'Маркетингова агенція з фокусом на SEO та контент-маркетинг для B2B', goal: '10 клієнтів, $5k MRR', stage: 'Active', bottleneck: 'Потрібен sales-менеджер', tags: 'marketing, seo, agency' });
+  created.push(proj1);
+  const proj2 = await api.createProject({ name: 'AI Nexus', description: 'Платформа для управління знаннями фаундерів — люди, проєкти, ідеї, можливості', goal: '1000 користувачів, $10k MRR', stage: 'MVP', bottleneck: 'Онбординг та AI-парсинг', tags: 'ai, saas, knowledge-management' });
+  created.push(proj2);
+
+  const i1 = await api.createIdea({ name: 'Dead Capital Tracker', pitch: 'Інструмент для відстеження невикористаних ресурсів (контакти, ідеї, можливості)', roi: 'Збільшення утилізації ресурсів на 30%', origin: 'Спостереження за власними невикористаними контактами', author: 'Юрій', requirements: 'UI/UX дизайнер, 2 тижні розробки', status: 'Hypothesis', tags: 'tool, capital, tracking' });
+  created.push(i1);
+  const i2 = await api.createIdea({ name: 'Voice → Entities', pitch: 'AI-парсинг голосових повідомлень у структуровані сутності Nexus', roi: 'Прискорення введення даних у 5 разів', origin: 'Фіча з Roadmap AI Nexus', author: 'Андрій', requirements: 'Whisper API, GPT-4', status: 'Research', tags: 'ai, voice, parsing' });
+  created.push(i2);
+
+  const o1 = await api.createOpportunity({ name: 'Знижка на Notion API', description: '50% знижка на Notion API план для стартапів — акція до кінця кварталу', category: '#Інструмент', source_type: 'external', tags: 'notion, api, discount' });
+  created.push(o1);
+  const o2 = await api.createOpportunity({ name: 'Партнерство з виробником', description: 'Виробник шукає маркетингового партнера для виходу на ринки ЄС', category: '#Партнерство', source_type: 'external', tags: 'partnership, manufacturing, eu' });
+  created.push(o2);
+
+  // Links
+  try { await api.createLink('person', p1.id, 'project', proj1.id); } catch(e) {}
+  try { await api.createLink('person', p2.id, 'project', proj2.id); } catch(e) {}
+  try { await api.createLink('idea', i2.id, 'project', proj2.id); } catch(e) {}
+
+  return created.length;
+}
+
+function SampleDataBanner() {
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
+  const [done, setDone] = useState(false);
+
+  async function handleLoad() {
+    setLoading(true);
+    try {
+      const count = await loadSampleData();
+      setDone(true);
+      setTimeout(() => router.push('/'), 2000);
+    } catch(e) {
+      alert('Помилка: ' + e.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  if (done) {
+    return (
+      <div className="mb-6 p-4 bg-emerald-950/50 border border-emerald-800/50 rounded-xl text-emerald-300 text-sm flex items-center gap-2">
+        <span>✅</span> Приклад дані завантажено! Перенаправляємо на головну...
+      </div>
+    );
+  }
+
+  return (
+    <div className="mb-6 p-4 bg-zinc-900/80 border border-zinc-800/80 rounded-xl">
+      <div className="flex items-center justify-between gap-4 flex-wrap">
+        <div>
+          <div className="text-sm font-semibold text-zinc-200">🧪 Не знаєте з чого почати?</div>
+          <div className="text-xs text-zinc-500 mt-0.5">Завантажте 10 прикладів сутностей з демо-даними</div>
+        </div>
+        <button
+          onClick={handleLoad}
+          disabled={loading}
+          className="px-4 py-2 rounded-xl bg-gradient-to-r from-cyan-600 to-violet-600 text-white text-sm font-semibold hover:opacity-90 transition-opacity whitespace-nowrap"
+        >
+          {loading ? 'Завантаження...' : '🚀 Завантажити приклад'}
+        </button>
+      </div>
+    </div>
+  );
+}
+
 // ── Quick Add ───────────────────────────────────────────────
 function parseQuickInput(text: string) {
   const result: { type: string; name: string; details: string }[] = [];
@@ -219,6 +298,8 @@ function AddForm() {
         <h1 className="text-2xl font-bold text-white mb-1">Додати сутність</h1>
         <p className="text-zinc-500 text-sm">Оберіть тип та заповніть форму</p>
       </div>
+
+      <SampleDataBanner />
 
       {/* Tabs — cyber pill style */}
       <div className="flex gap-1.5 mb-8 bg-zinc-900/80 p-1.5 rounded-2xl border border-zinc-800/80">
