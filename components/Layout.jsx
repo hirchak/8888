@@ -3,7 +3,7 @@ import '../app/globals.css';
 
 import { Suspense } from 'react';
 import { Logo, NavLinks } from './Header';
-import SearchForm from './SearchForm';
+import SearchForm from './SearchBar';
 import OnboardingTour from './OnboardingTour';
 import ThemeToggle from './ThemeToggle';
 
