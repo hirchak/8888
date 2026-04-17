@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { api } from '@/lib/api';
 import { CardActions, LoadingSpinner, ErrorMessage, formatDate } from '@/components/CardActions';
+import LinksRecommendation from '@/app/components/LinksRecommendation';
 
 const STATUSES = ['Hypothesis', 'Research', 'Resources', 'Ready', 'Launched', 'Paused'];
 
@@ -262,6 +263,9 @@ export default function IdeaPage() {
           </div>
         ) : !showOppPicker && <p className="text-zinc-500 text-sm">Немає прив&apos;язаних можливостей</p>}
       </div>
+
+      {/* Recommendations */}
+      <LinksRecommendation entityType="ideas" entityId={Number(id)} />
 
       {/* Meta */}
       <div className="text-xs text-zinc-600">

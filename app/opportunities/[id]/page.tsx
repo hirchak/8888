@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
 import { CardActions, LoadingSpinner, ErrorMessage, formatDate } from '@/components/CardActions';
+import LinksRecommendation from '@/app/components/LinksRecommendation';
 
 const SOURCE_TYPES = ['external', 'own_project'];
 const CATEGORIES = ['#Інструмент', '#Фінанси', '#Зв\'язки', '#Експертиза', '#Капітал', '#Партнерство'];
@@ -130,6 +131,9 @@ export default function OpportunityPage() {
           }
         </div>
       </div>
+
+      {/* Recommendations */}
+      <LinksRecommendation entityType="opportunities" entityId={Number(id)} />
 
       {/* Meta */}
       <div className="text-xs text-zinc-600">

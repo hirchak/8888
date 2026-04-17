@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { api } from '@/lib/api';
 import { CardActions, LoadingSpinner, ErrorMessage, formatDate } from '@/components/CardActions';
+import LinksRecommendation from '@/app/components/LinksRecommendation';
 
 const IDEA_STAGES_MAP = {
   'Hypothesis': { label: 'Гіпотеза', color: 'bg-amber-900/50 text-amber-300 border border-amber-800/40' },
@@ -286,6 +287,9 @@ export default function PersonPage() {
           <p className="text-zinc-600 text-sm py-2">Немає прив&apos;язаних ідей</p>
         )}
       </div>
+
+      {/* Recommendations */}
+      <LinksRecommendation entityType="people" entityId={Number(id)} />
 
       {/* Meta */}
       <div className="text-xs text-zinc-700 text-center space-y-1">

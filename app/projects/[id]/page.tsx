@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { api } from '@/lib/api';
 import { CardActions, LoadingSpinner, ErrorMessage, formatDate } from '@/components/CardActions';
+import LinksRecommendation from '@/app/components/LinksRecommendation';
 
 const STAGES = ['Planning', 'MVP', 'Beta', 'Active', 'Paused'];
 const STAGE_CLASSES = {
@@ -222,6 +223,9 @@ export default function ProjectPage() {
           </div>
         ) : !showOppPicker && <p className="text-zinc-500 text-sm">Немає прив&apos;язаних можливостей</p>}
       </div>
+
+      {/* Recommendations */}
+      <LinksRecommendation entityType="projects" entityId={Number(id)} />
 
       {/* Meta */}
       <div className="text-xs text-zinc-600">

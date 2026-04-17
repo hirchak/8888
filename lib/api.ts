@@ -72,6 +72,10 @@ export const api = {
       body: JSON.stringify({ source_type: sourceType, source_id: sourceId, target_type: targetType, target_id: targetId }),
     }),
 
+  // Recommendations
+  getRecommendations: (entityType: string, entityId: number, limit = 5) =>
+    request(`/api/recommendations?entityType=${entityType}&entityId=${entityId}&limit=${limit}`),
+
   // Tasks
   listTasks: () => request('/api/tasks'),
   createTask: (data: any) =>
