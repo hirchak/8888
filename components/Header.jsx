@@ -2,7 +2,6 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useState } from 'react';
 
 function NexusIcon() {
   return (
@@ -61,7 +60,6 @@ const NAV_ITEMS = [
 
 export function NavLinks() {
   const pathname = usePathname();
-  const [open, setOpen] = useState(false);
 
   function isActive(href) {
     return pathname === href;
@@ -82,56 +80,6 @@ export function NavLinks() {
           </Link>
         ))}
       </nav>
-
-      {/* Mobile hamburger */}
-      <button
-        type="button"
-        className="md:hidden p-2 rounded-xl text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/80 transition-colors"
-        onClick={() => setOpen(!open)}
-        aria-label="Меню"
-      >
-        {open ? (
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M4 4l12 12M16 4L4 16" strokeLinecap="round"/>
-          </svg>
-        ) : (
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M3 6h14M3 10h14M3 14h14" strokeLinecap="round"/>
-          </svg>
-        )}
-      </button>
-
-      {/* Mobile menu drawer */}
-      {open && (
-        <>
-          <div
-            className="fixed inset-0 bg-black/70 backdrop-blur-md z-40 md:hidden"
-            onClick={() => setOpen(false)}
-          />
-          <div className="fixed top-0 right-0 bottom-0 w-72 bg-zinc-950 border-l border-zinc-800/80 z-50 md:hidden flex flex-col pt-20 px-4 pb-6 gap-1 shadow-2xl">
-            <button
-              type="button"
-              className="absolute top-4 right-4 p-2 text-zinc-400 hover:text-zinc-200"
-              onClick={() => setOpen(false)}
-            >
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M4 4l12 12M16 4L4 16" strokeLinecap="round"/>
-              </svg>
-            </button>
-            {NAV_ITEMS.map(item => (
-              <Link
-                key={item.href}
-                href={item.href}
-                onClick={() => setOpen(false)}
-                className={`nav-link ${isActive(item.href) ? 'nav-link-active' : 'nav-link-inactive'}`}
-              >
-                {item.icon}
-                <span>{item.label}</span>
-              </Link>
-            ))}
-          </div>
-        </>
-      )}
     </>
   );
 }

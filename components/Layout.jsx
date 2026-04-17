@@ -7,6 +7,7 @@ import { Logo, NavLinks } from './Header';
 import SearchForm from './SearchBar';
 import OnboardingTour from './OnboardingTour';
 import ThemeToggle from './ThemeToggle';
+import BottomTabBar from './BottomTabBar';
 
 export default function Layout({ children }) {
   return (
@@ -40,6 +41,7 @@ export default function Layout({ children }) {
       <main className="flex-1 max-w-6xl mx-auto w-full px-4 py-6">
         {children}
       </main>
+      <BottomTabBar />
       <OnboardingTour />
     </div>
   );
