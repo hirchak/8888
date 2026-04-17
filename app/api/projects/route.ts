@@ -56,6 +56,7 @@ export async function POST(req: NextRequest) {
       bottleneck: data.bottleneck || '',
       founder_id: data.founder_id ?? null,
       tags: data.tags || '',
+      isPublic: data.isPublic === true,
       created_at: now,
       updated_at: now,
     };

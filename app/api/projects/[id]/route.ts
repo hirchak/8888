@@ -28,7 +28,7 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
     if (idx === -1) return NextResponse.json({ detail: 'Project not found' }, { status: 404 });
 
     const proj = db.projects[idx];
-    for (const key of ['name', 'description', 'goal', 'stage', 'bottleneck', 'founder_id', 'tags']) {
+    for (const key of ['name', 'description', 'goal', 'stage', 'bottleneck', 'founder_id', 'tags', 'isPublic']) {
       if (data[key] !== undefined) (proj as any)[key] = data[key];
     }
     proj.updated_at = new Date().toISOString();

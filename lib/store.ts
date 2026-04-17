@@ -13,7 +13,20 @@ if (!g.nexusData) {
     links: [],
     tasks: [],
     nextId: { people: 1, projects: 1, ideas: 1, opportunities: 1, tasks: 1 },
+    // Username index: username string (without @) -> person id
+    usernameIndex: {},
   };
+}
+
+// Sync username index when people are added/removed/updated
+function indexUsername(personId: number, username: string | null, prevUsername: string | null) {
+  const idx = g.nexusData.usernameIndex;
+  if (prevUsername && prevUsername in idx) delete idx[prevUsername];
+  if (username) idx[username.toLowerCase()] = personId;
+}
+
+function getPersonIdByUsername(username: string): number | null {
+  return g.nexusData.usernameIndex[username.toLowerCase()] ?? null;
 }
 
 export const db = g.nexusData;
@@ -71,3 +84,5 @@ export function removeLinksByEntity(entityType: string, entityId: number) {
     (l: Link) => !(l.source_type === entityType && l.source_id === entityId) && !(l.target_type === entityType && l.target_id === entityId)
   );
 }
+
+export { indexUsername, getPersonIdByUsername };

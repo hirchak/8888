@@ -23,7 +23,8 @@ export default function PersonPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [editing, setEditing] = useState(false);
-  const [form, setForm] = useState<Record<string, string>>({});
+  type PersonForm = Record<string, string | boolean>;
+  const [form, setForm] = useState<PersonForm>({});
   const [saving, setSaving] = useState(false);
   const [showProjectPicker, setShowProjectPicker] = useState(false);
   const [showIdeaPicker, setShowIdeaPicker] = useState(false);
@@ -48,6 +49,8 @@ export default function PersonPage() {
         summary: data.summary,
         interests: data.interests,
         tags: data.tags || '',
+        username: data.username || '',
+        isPublic: data.isPublic === true,
       });
     } catch (e) {
       setError(e.message);
@@ -132,7 +135,7 @@ export default function PersonPage() {
             </div>
             <div>
               {editing
-                ? <input value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} className="input-field text-xl font-bold" />
+                ? <input value={String(form.name || '')} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} className="input-field text-xl font-bold" />
                 : <h1 className="text-2xl font-bold text-white">{person.name}</h1>
               }
               {person.role && !editing && (
@@ -143,7 +146,7 @@ export default function PersonPage() {
           <CardActions
             editing={editing}
             onEdit={() => setEditing(true)}
-            onCancel={() => { setEditing(false); setForm({ name: person.name, role: person.role, expertise: person.expertise, company: person.company, contact: person.contact, summary: person.summary, interests: person.interests }); }}
+            onCancel={() => { setEditing(false); setForm({ name: person.name, role: person.role, expertise: person.expertise, company: person.company, contact: person.contact, summary: person.summary, interests: person.interests, tags: person.tags || '', username: person.username || '', isPublic: person.isPublic === true }); }}
             onSave={save}
             saving={saving}
             onDelete={remove}
@@ -160,7 +163,7 @@ export default function PersonPage() {
           {editing
             ? (
               <textarea
-                value={form.summary}
+                value={String(form.summary || '')}
                 onChange={e => setForm(f => ({ ...f, summary: e.target.value }))}
                 className="input-field min-h-[100px] resize-y"
               />
@@ -187,12 +190,54 @@ export default function PersonPage() {
           <div key={key}>
             <div className="label">{label}</div>
             {editing ? (
-              <input value={form[key]} onChange={e => setForm(f => ({ ...f, [key]: e.target.value }))} className="input-field" />
+              <input value={String(form[key] || '')} onChange={e => setForm(f => ({ ...f, [key]: e.target.value }))} className="input-field" />
             ) : (
               <p className="text-zinc-200">{person[key] || <span className="text-zinc-600">—</span>}</p>
             )}
           </div>
         ))}
+
+        {/* Username field */}
+        <div>
+          <div className="label">Username (публічний URL)</div>
+          {editing ? (
+            <input value={String(form.username || '')} onChange={e => setForm(f => ({ ...f, username: e.target.value.replace(/^@/, '') }))} className="input-field" placeholder="hirchak" />
+          ) : (
+            <p className="text-zinc-200">
+              {person.username ? (
+                <span>
+                  <a href={`/${person.username}`} className="text-cyan-400 hover:text-cyan-300 underline underline-offset-2">@{person.username}</a>
+                  <span className="text-zinc-500 text-xs ml-2">(переглянути публічний профіль)</span>
+                </span>
+              ) : <span className="text-zinc-600">—</span>}
+            </p>
+          )}
+        </div>
+
+        {/* isPublic toggle — only shown in edit mode */}
+        {editing && (
+          <div className="flex items-center gap-3 pt-2 border-t border-zinc-800/80">
+            <label className="flex items-center gap-2.5 cursor-pointer select-none">
+              <input
+                type="checkbox"
+                checked={Boolean(form.isPublic)}
+                onChange={e => setForm(f => ({ ...f, isPublic: e.target.checked }))}
+                className="w-4 h-4 rounded border-zinc-600 bg-zinc-800 text-cyan-500 focus:ring-cyan-500/30 focus:ring-offset-0"
+              />
+              <div>
+                <span className="text-sm font-medium text-zinc-200">Публічний профіль</span>
+                <p className="text-xs text-zinc-500">Дозволить ділитися посиланням /username</p>
+              </div>
+            </label>
+          </div>
+        )}
+        {!editing && person.username && (
+          <div className="flex items-center gap-2 pt-1">
+            <span className={`tag text-xs ${person.isPublic ? 'bg-emerald-900/50 text-emerald-300 border border-emerald-800/40' : 'bg-zinc-800/60 text-zinc-500 border border-zinc-700/50'}`}>
+              {person.isPublic ? '🌐 Публічний' : '🔒 Приватний'}
+            </span>
+          </div>
+        )}
       </div>
 
       {/* Projects */}

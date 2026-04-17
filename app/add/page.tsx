@@ -34,26 +34,26 @@ function Field({ label, value, onChange, type = 'text', placeholder, required = 
 async function loadSampleData() {
   const created = [];
 
-  const p1 = await api.createPerson({ name: 'Андрій Пиха', role: 'Партнер', expertise: 'Marketing, Sales', company: 'SEO-Open', contact: '@andrisav', summary: 'Партнер та маркетинг-спеціаліст, Prague', interests: 'marketing, ai, automation', tags: 'partner, marketing' });
+  const p1 = await api.createPerson({ name: 'Андрій Пиха', role: 'Партнер', expertise: 'Marketing, Sales', company: 'SEO-Open', contact: '@andrisav', summary: 'Партнер та маркетинг-спеціаліст, Prague', interests: 'marketing, ai, automation', tags: 'partner, marketing', username: 'andrisav', isPublic: true });
   created.push(p1);
-  const p2 = await api.createPerson({ name: 'Юрій @Hirchak', role: 'Фаундер', expertise: 'AI, Full-stack', company: 'AI Nexus', contact: '@Hirchak', summary: 'Фаундер платформи AI Nexus, Warsaw', interests: 'ai, platform, saas', tags: 'founder, developer' });
+  const p2 = await api.createPerson({ name: 'Юрій Hirchak', role: 'Фаундер', expertise: 'AI, Full-stack', company: 'AI Nexus', contact: '@Hirchak', summary: 'Фаундер платформи AI Nexus, Warsaw', interests: 'ai, platform, saas', tags: 'founder, developer', username: 'hirchak', isPublic: true });
   created.push(p2);
-  const p3 = await api.createPerson({ name: 'Маркіян К.', role: 'Юрист', expertise: 'IT Law, Contracts', company: 'Юрфірма', contact: 'markiyan@example.com', summary: 'Юрист з досвідом у IT-праві, Київ', interests: 'law, it, contracts', tags: 'lawyer, legal' });
+  const p3 = await api.createPerson({ name: 'Маркіян К.', role: 'Юрист', expertise: 'IT Law, Contracts', company: 'Юрфірма', contact: 'markiyan@example.com', summary: 'Юрист з досвідом у IT-праві, Київ', interests: 'law, it, contracts', tags: 'lawyer, legal', isPublic: false });
   created.push(p3);
 
-  const proj1 = await api.createProject({ name: 'SEO-Open', description: 'Маркетингова агенція з фокусом на SEO та контент-маркетинг для B2B', goal: '10 клієнтів, $5k MRR', stage: 'Active', bottleneck: 'Потрібен sales-менеджер', tags: 'marketing, seo, agency' });
+  const proj1 = await api.createProject({ name: 'SEO-Open', description: 'Маркетингова агенція з фокусом на SEO та контент-маркетинг для B2B', goal: '10 клієнтів, $5k MRR', stage: 'Active', bottleneck: 'Потрібен sales-менеджер', tags: 'marketing, seo, agency', isPublic: true });
   created.push(proj1);
-  const proj2 = await api.createProject({ name: 'AI Nexus', description: 'Платформа для управління знаннями фаундерів — люди, проєкти, ідеї, можливості', goal: '1000 користувачів, $10k MRR', stage: 'MVP', bottleneck: 'Онбординг та AI-парсинг', tags: 'ai, saas, knowledge-management' });
+  const proj2 = await api.createProject({ name: 'AI Nexus', description: 'Платформа для управління знаннями фаундерів — люди, проєкти, ідеї, можливості', goal: '1000 користувачів, $10k MRR', stage: 'MVP', bottleneck: 'Онбординг та AI-парсинг', tags: 'ai, saas, knowledge-management', isPublic: true });
   created.push(proj2);
 
-  const i1 = await api.createIdea({ name: 'Dead Capital Tracker', pitch: 'Інструмент для відстеження невикористаних ресурсів (контакти, ідеї, можливості)', roi: 'Збільшення утилізації ресурсів на 30%', origin: 'Спостереження за власними невикористаними контактами', author: 'Юрій', requirements: 'UI/UX дизайнер, 2 тижні розробки', status: 'Hypothesis', tags: 'tool, capital, tracking' });
+  const i1 = await api.createIdea({ name: 'Dead Capital Tracker', pitch: 'Інструмент для відстеження невикористаних ресурсів (контакти, ідеї, можливості)', roi: 'Збільшення утилізації ресурсів на 30%', origin: 'Спостереження за власними невикористаними контактами', author: 'Юрій', requirements: 'UI/UX дизайнер, 2 тижні розробки', status: 'Hypothesis', tags: 'tool, capital, tracking', isPublic: true });
   created.push(i1);
-  const i2 = await api.createIdea({ name: 'Voice → Entities', pitch: 'AI-парсинг голосових повідомлень у структуровані сутності Nexus', roi: 'Прискорення введення даних у 5 разів', origin: 'Фіча з Roadmap AI Nexus', author: 'Андрій', requirements: 'Whisper API, GPT-4', status: 'Research', tags: 'ai, voice, parsing' });
+  const i2 = await api.createIdea({ name: 'Voice → Entities', pitch: 'AI-парсинг голосових повідомлень у структуровані сутності Nexus', roi: 'Прискорення введення даних у 5 разів', origin: 'Фіча з Roadmap AI Nexus', author: 'Андрій', requirements: 'Whisper API, GPT-4', status: 'Research', tags: 'ai, voice, parsing', isPublic: true });
   created.push(i2);
 
-  const o1 = await api.createOpportunity({ name: 'Знижка на Notion API', description: '50% знижка на Notion API план для стартапів — акція до кінця кварталу', category: '#Інструмент', source_type: 'external', tags: 'notion, api, discount' });
+  const o1 = await api.createOpportunity({ name: 'Знижка на Notion API', description: '50% знижка на Notion API план для стартапів — акція до кінця кварталу', category: '#Інструмент', source_type: 'external', tags: 'notion, api, discount', isPublic: true });
   created.push(o1);
-  const o2 = await api.createOpportunity({ name: 'Партнерство з виробником', description: 'Виробник шукає маркетингового партнера для виходу на ринки ЄС', category: '#Партнерство', source_type: 'external', tags: 'partnership, manufacturing, eu' });
+  const o2 = await api.createOpportunity({ name: 'Партнерство з виробником', description: 'Виробник шукає маркетингового партнера для виходу на ринки ЄС', category: '#Партнерство', source_type: 'external', tags: 'partnership, manufacturing, eu', isPublic: true });
   created.push(o2);
 
   // Links
@@ -255,10 +255,10 @@ function AddForm() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
 
-  const [person, setPerson] = useState({ name: '', role: '', expertise: '', company: '', contact: '', summary: '', interests: '', tags: '' });
-  const [project, setProject] = useState({ name: '', description: '', goal: '', stage: 'Planning', bottleneck: '', tags: '' });
-  const [idea, setIdea] = useState({ name: '', pitch: '', roi: '', origin: '', author: '', requirements: '', matched_assets: '', status: 'Hypothesis', tags: '' });
-  const [opp, setOpp] = useState({ name: '', description: '', category: '', source_type: 'external', tags: '' });
+  const [person, setPerson] = useState({ name: '', role: '', expertise: '', company: '', contact: '', summary: '', interests: '', tags: '', username: '', isPublic: false });
+  const [project, setProject] = useState({ name: '', description: '', goal: '', stage: 'Planning', bottleneck: '', tags: '', isPublic: false });
+  const [idea, setIdea] = useState({ name: '', pitch: '', roi: '', origin: '', author: '', requirements: '', matched_assets: '', status: 'Hypothesis', tags: '', isPublic: false });
+  const [opp, setOpp] = useState({ name: '', description: '', category: '', source_type: 'external', tags: '', isPublic: false });
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -331,6 +331,7 @@ function AddForm() {
           <>
             <div className="cyber-card space-y-5">
               <Field label="Ім&apos;я" value={person.name} onChange={v => setPerson(p => ({ ...p, name: v }))} required placeholder="Олександр Петренко" />
+              <Field label="Username (без @)" value={person.username} onChange={v => setPerson(p => ({ ...p, username: v.replace(/^@/, '') }))} placeholder="hirchak" />
               <Field label="Роль / Посада" value={person.role} onChange={v => setPerson(p => ({ ...p, role: v }))} placeholder="Senior Developer" />
               <Field label="Експертиза" value={person.expertise} onChange={v => setPerson(p => ({ ...p, expertise: v }))} placeholder="AI, Python, Архітектура" />
               <Field label="Компанія" value={person.company} onChange={v => setPerson(p => ({ ...p, company: v }))} placeholder="TechCorp" />
@@ -338,6 +339,21 @@ function AddForm() {
               <Field label="Інтереси" value={person.interests} onChange={v => setPerson(p => ({ ...p, interests: v }))} placeholder="AI, крипто, нерухомість" />
               <Field label="Теги" value={person.tags} onChange={v => setPerson(p => ({ ...p, tags: v }))} placeholder="ukraine, fintech, ai (comma-separated)" />
               <Field label="Підсумок" value={person.summary} onChange={v => setPerson(p => ({ ...p, summary: v }))} type="textarea" placeholder="Короткий опис..." />
+              {/* Public toggle */}
+              <div className="flex items-center gap-3 pt-2 border-t border-zinc-800/80">
+                <label className="flex items-center gap-2.5 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={person.isPublic}
+                    onChange={e => setPerson(p => ({ ...p, isPublic: e.target.checked }))}
+                    className="w-4 h-4 rounded border-zinc-600 bg-zinc-800 text-cyan-500 focus:ring-cyan-500/30 focus:ring-offset-0"
+                  />
+                  <div>
+                    <span className="text-sm font-medium text-zinc-200">Зробити публічним</span>
+                    <p className="text-xs text-zinc-500">Дозволить ділитися профілем через публічне посилання</p>
+                  </div>
+                </label>
+              </div>
             </div>
           </>
         )}
@@ -357,6 +373,21 @@ function AddForm() {
               </div>
               <Field label="Вузьке місце" value={project.bottleneck} onChange={v => setProject(p => ({ ...p, bottleneck: v }))} type="textarea" placeholder="Що зараз гальмує..." />
               <Field label="Теги" value={project.tags} onChange={v => setProject(p => ({ ...p, tags: v }))} placeholder="saas, b2b, ai (comma-separated)" />
+              {/* Public toggle */}
+              <div className="flex items-center gap-3 pt-2 border-t border-zinc-800/80">
+                <label className="flex items-center gap-2.5 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={project.isPublic}
+                    onChange={e => setProject(p => ({ ...p, isPublic: e.target.checked }))}
+                    className="w-4 h-4 rounded border-zinc-600 bg-zinc-800 text-emerald-500 focus:ring-emerald-500/30 focus:ring-offset-0"
+                  />
+                  <div>
+                    <span className="text-sm font-medium text-zinc-200">Зробити публічним</span>
+                    <p className="text-xs text-zinc-500">Відображатиметься у публічному профілі</p>
+                  </div>
+                </label>
+              </div>
             </div>
           </>
         )}
@@ -378,6 +409,21 @@ function AddForm() {
                 <select value={idea.status} onChange={e => setIdea(i => ({ ...i, status: e.target.value }))} className="input-field">
                   {IDEA_STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
                 </select>
+              </div>
+              {/* Public toggle */}
+              <div className="flex items-center gap-3 pt-2 border-t border-zinc-800/80">
+                <label className="flex items-center gap-2.5 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={idea.isPublic}
+                    onChange={e => setIdea(i => ({ ...i, isPublic: e.target.checked }))}
+                    className="w-4 h-4 rounded border-zinc-600 bg-zinc-800 text-amber-500 focus:ring-amber-500/30 focus:ring-offset-0"
+                  />
+                  <div>
+                    <span className="text-sm font-medium text-zinc-200">Зробити публічним</span>
+                    <p className="text-xs text-zinc-500">Відображатиметься у публічному профілі</p>
+                  </div>
+                </label>
               </div>
             </div>
           </>
@@ -403,6 +449,21 @@ function AddForm() {
                 </select>
               </div>
               <Field label="Теги" value={opp.tags} onChange={v => setOpp(o => ({ ...o, tags: v }))} placeholder="aws, credits, cloud (comma-separated)" />
+              {/* Public toggle */}
+              <div className="flex items-center gap-3 pt-2 border-t border-zinc-800/80">
+                <label className="flex items-center gap-2.5 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={opp.isPublic}
+                    onChange={e => setOpp(o => ({ ...o, isPublic: e.target.checked }))}
+                    className="w-4 h-4 rounded border-zinc-600 bg-zinc-800 text-violet-500 focus:ring-violet-500/30 focus:ring-offset-0"
+                  />
+                  <div>
+                    <span className="text-sm font-medium text-zinc-200">Зробити публічним</span>
+                    <p className="text-xs text-zinc-500">Відображатиметься у публічному профілі</p>
+                  </div>
+                </label>
+              </div>
             </div>
           </>
         )}

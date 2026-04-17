@@ -20,7 +20,7 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
     if (idx === -1) return NextResponse.json({ detail: 'Opportunity not found' }, { status: 404 });
 
     const row = db.opportunities[idx];
-    for (const key of ['name', 'description', 'category', 'source_type', 'source_person_id', 'source_project_id', 'lastUsedAt']) {
+    for (const key of ['name', 'description', 'category', 'source_type', 'source_person_id', 'source_project_id', 'lastUsedAt', 'tags', 'isPublic']) {
       if (data[key] !== undefined) (row as any)[key] = data[key];
     }
     row.updated_at = new Date().toISOString();

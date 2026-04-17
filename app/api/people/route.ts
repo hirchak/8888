@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { db, generateId, getLinkedIds } from '@/lib/store';
+import { db, generateId, getLinkedIds, indexUsername } from '@/lib/store';
 
 export async function GET(req: NextRequest) {
   try {
@@ -54,9 +54,13 @@ export async function POST(req: NextRequest) {
       summary: data.summary || '',
       interests: data.interests || '',
       tags: data.tags || '',
+      username: data.username || null,
+      isPublic: data.isPublic === true,
       created_at: now,
       updated_at: now,
     };
+
+    indexUsername(newItem.id, newItem.username, null);
 
     db.people.push(newItem);
     const person = { ...newItem };

@@ -58,6 +58,7 @@ export async function POST(req: NextRequest) {
       matched_assets: data.matched_assets || '',
       status: data.status || 'Hypothesis',
       tags: data.tags || '',
+      isPublic: data.isPublic === true,
       created_at: now,
       updated_at: now,
     };

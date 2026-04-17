@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { db, generateId, getLinkedIds, addLink, removeLinksByEntity } from '@/lib/store';
+import { db, generateId, getLinkedIds, addLink, removeLinksByEntity, indexUsername } from '@/lib/store';
 
 export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
   try {
@@ -29,9 +29,11 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
 
     const person = db.people[idx];
     const now = new Date().toISOString();
-    for (const key of ['name', 'role', 'expertise', 'company', 'contact', 'summary', 'interests', 'tags']) {
+    const prevUsername = (person as any).username;
+    for (const key of ['name', 'role', 'expertise', 'company', 'contact', 'summary', 'interests', 'tags', 'username', 'isPublic']) {
       if (data[key] !== undefined) (person as any)[key] = data[key];
     }
+    if (data.username !== undefined) indexUsername(id, data.username, prevUsername);
     person.updated_at = now;
 
     const result = { ...person };
@@ -52,6 +54,8 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
     const id = Number(params.id);
     const idx = db.people.findIndex((p: any) => p.id === id);
     if (idx === -1) return NextResponse.json({ detail: 'Person not found' }, { status: 404 });
+    const person = db.people[idx];
+    if (person.username) indexUsername(id, null, person.username);
 
     removeLinksByEntity('person', id);
     db.people.splice(idx, 1);

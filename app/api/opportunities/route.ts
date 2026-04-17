@@ -46,6 +46,7 @@ export async function POST(req: NextRequest) {
       source_person_id: data.source_person_id ?? null,
       source_project_id: data.source_project_id ?? null,
       tags: data.tags || '',
+      isPublic: data.isPublic === true,
       created_at: now,
       updated_at: now,
       lastUsedAt: now,
