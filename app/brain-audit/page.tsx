@@ -1,42 +1,36 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import Link from 'next/link';
 import { api } from '@/lib/api';
 
-// ── Entity type config ────────────────────────────────────────
 const ENTITY_CONFIG = {
   person: {
     label: 'Людина',
     icon: '👤',
     tagClass: 'tag-people',
     color: 'blue',
-    colorAccent: 'text-blue-400',
   },
   project: {
     label: 'Проєкт',
     icon: '🚀',
     tagClass: 'tag-project',
     color: 'emerald',
-    colorAccent: 'text-emerald-400',
   },
   idea: {
     label: 'Ідея',
     icon: '💡',
     tagClass: 'tag-idea',
     color: 'amber',
-    colorAccent: 'text-amber-400',
   },
   opportunity: {
     label: 'Можливість',
     icon: '🧩',
     tagClass: 'tag-opportunity',
     color: 'violet',
-    colorAccent: 'text-violet-400',
   },
 };
 
-// ── Entity Card ────────────────────────────────────────────────
 function ResultCard({ entity }: { entity: { type: string; name: string; confidence: number } }) {
   const config = ENTITY_CONFIG[entity.type] || ENTITY_CONFIG.person;
   return (
@@ -45,13 +39,12 @@ function ResultCard({ entity }: { entity: { type: string; name: string; confiden
         <div
           className={`w-10 h-10 rounded-xl flex items-center justify-center text-lg shrink-0`}
           style={{
-            background: `rgba(var(--${config.color}-900-rgb, 55, 65, 81) / 0.5)`,
             backgroundColor:
               entity.type === 'person' ? 'rgba(30, 58, 138, 0.5)' :
               entity.type === 'project' ? 'rgba(6, 78, 59, 0.5)' :
               entity.type === 'idea' ? 'rgba(120, 53, 15, 0.5)' :
               'rgba(88, 28, 135, 0.5)',
-            border: `1px solid rgba(var(--${config.color}-800-rgb, 75, 85, 99) / 0.4)`,
+            border: '1px solid rgba(75, 85, 99, 0.4)',
           }}
         >
           {config.icon}
@@ -63,7 +56,7 @@ function ResultCard({ entity }: { entity: { type: string; name: string; confiden
           <div className="flex items-center gap-2 mt-1.5">
             <span className={`tag ${config.tagClass}`}>{config.label}</span>
             <span className="text-xs text-zinc-600">
-              {Math.round(entity.confidence * 100)}% впевненість
+              {Math.round(entity.confidence * 100)}%
             </span>
           </div>
         </div>
@@ -72,7 +65,6 @@ function ResultCard({ entity }: { entity: { type: string; name: string; confiden
   );
 }
 
-// ── Section ────────────────────────────────────────────────────
 function EntitySection({ type, entities }: { type: string; entities: any[] }) {
   if (entities.length === 0) return null;
   const config = ENTITY_CONFIG[type];
@@ -92,13 +84,44 @@ function EntitySection({ type, entities }: { type: string; entities: any[] }) {
   );
 }
 
-// ── Main Page ──────────────────────────────────────────────────
+async function extractTextFromFile(file: File): Promise<string> {
+  const ext = file.name.split('.').pop()?.toLowerCase();
+
+  if (ext === 'txt') {
+    return await file.text();
+  }
+
+  if (ext === 'docx') {
+    // Basic DOCX extraction via zip
+    const { default: JSZip } = await import('jszip');
+    const arrayBuffer = await file.arrayBuffer();
+    const zip = new JSZip();
+    await zip.loadAsync(arrayBuffer);
+    const docXml = await zip.file('word/document.xml')?.async('text') || '';
+    // Simple strip of XML tags
+    return docXml.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+  }
+
+  if (ext === 'md') {
+    return await file.text();
+  }
+
+  // Fallback: try as text
+  try {
+    return await file.text();
+  } catch {
+    return '';
+  }
+}
+
 export default function BrainAuditPage() {
   const [text, setText] = useState('');
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState<any>(null);
   const [error, setError] = useState('');
+  const [fileName, setFileName] = useState('');
   const [analyzed, setAnalyzed] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleAnalyze = async () => {
     if (!text.trim()) return;
@@ -130,6 +153,19 @@ export default function BrainAuditPage() {
     setResults(null);
     setAnalyzed(false);
     setError('');
+    setFileName('');
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setFileName(file.name);
+    try {
+      const content = await extractTextFromFile(file);
+      setText(content);
+    } catch {
+      setError('Не вдалося прочитати файл');
+    }
   };
 
   const grouped = results?.entities
@@ -144,27 +180,31 @@ export default function BrainAuditPage() {
   const total = results?.summary?.total || 0;
 
   return (
-    <div className="space-y-10">
-      {/* ── Header ── */}
-      <div className="flex items-center justify-between mb-6">
+    <div className="space-y-8">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-4">
         <div>
           <h1 className="text-2xl font-bold text-white">Аналізатор</h1>
           <p className="text-zinc-500 text-sm mt-1">Витягни сутності з тексту</p>
         </div>
+        <Link href="/voice" className="text-xs text-zinc-600 hover:text-cyan-400 transition-colors">
+          🎤 Голос →
+        </Link>
       </div>
 
-      {/* ── Input Section ── */}
-      <div className="space-y-4">
+      {/* Input */}
+      <div className="space-y-3">
         <div className="relative">
           <textarea
             value={text}
             onChange={e => setText(e.target.value)}
-            placeholder="Вставте текст, нотатки, список контактів, описи ідей або будь-які записи..."
-            className="input-field resize-none h-48 text-sm leading-relaxed"
+            placeholder="Встав текст або завантаж файл..."
+            className="input-field resize-none h-40 text-sm leading-relaxed"
             disabled={loading}
           />
-          <div className="absolute bottom-3 right-3 text-xs text-zinc-600">
-            {text.length} символів
+          <div className="absolute bottom-3 right-3 text-xs text-zinc-600 flex items-center gap-3">
+            {fileName && <span className="text-cyan-400">📎 {fileName}</span>}
+            <span>{text.length} симв.</span>
           </div>
         </div>
 
@@ -175,17 +215,24 @@ export default function BrainAuditPage() {
             className="btn-primary flex items-center gap-2"
           >
             {loading ? (
-              <>
-                <div className="spinner w-4 h-4 border-2 border-white/30 border-t-white" />
-                Аналізую...
-              </>
+              <><div className="spinner w-4 h-4 border-2 border-white/30 border-t-white" />Аналізую...</>
             ) : (
-              <>
-                <span>🔍</span>
-                Проаналізувати
-              </>
+              <><span>🔍</span>Проаналізувати</>
             )}
           </button>
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            className="btn-secondary text-sm flex items-center gap-2"
+          >
+            📎 Файл
+          </button>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".txt,.md,.docx"
+            onChange={handleFileChange}
+            className="hidden"
+          />
           {analyzed && (
             <button onClick={handleReset} className="btn-secondary text-sm">
               Очистити
@@ -200,18 +247,18 @@ export default function BrainAuditPage() {
         )}
       </div>
 
-      {/* ── Loading State ── */}
+      {/* Loading */}
       {loading && (
         <div className="flex flex-col items-center justify-center py-16 space-y-4">
           <div className="spinner w-12 h-12" />
-          <p className="text-zinc-500 text-sm">AI аналізує ваш текст...</p>
+          <p className="text-zinc-500 text-sm">AI аналізує...</p>
         </div>
       )}
 
-      {/* ── Results ── */}
+      {/* Results */}
       {!loading && results && (
         <div className="space-y-8 animate-slide-up">
-          {/* Summary bar */}
+          {/* Summary */}
           <div className="cyber-card flex flex-wrap items-center gap-4">
             <div className="text-sm text-zinc-400">
               Знайдено <span className="text-white font-bold text-xl">{total}</span> сутностей
@@ -236,7 +283,7 @@ export default function BrainAuditPage() {
           {total === 0 && (
             <div className="text-center py-12 space-y-3">
               <div className="text-4xl">🔍</div>
-              <p className="text-zinc-400">Сутностей не знайдено. Спробуйте інший текст.</p>
+              <p className="text-zinc-400">Сутностей не знайдено.</p>
             </div>
           )}
 
@@ -254,31 +301,18 @@ export default function BrainAuditPage() {
             <EntitySection type="opportunity" entities={grouped.opportunity} />
           )}
 
-          {/* CTA to save */}
-          <div className="hero-gradient rounded-2xl p-8 text-center space-y-4">
-            <h3 className="text-xl font-bold text-white">
-              Зберегти результати в Nexus?
-            </h3>
-            <p className="text-zinc-400 text-sm">
-              Додайте знайдені сутності до своєї бази.
-            </p>
+          {/* CTA */}
+          <div className="hero-gradient rounded-2xl p-6 text-center">
+            <p className="text-zinc-400 text-sm mb-3">Зберегти результати в Nexus?</p>
             <div className="flex flex-wrap items-center justify-center gap-3">
               <Link href="/add" className="btn-primary flex items-center gap-2">
-                <span>➕</span>
-                Додати в базу
+                <span>➕</span>Додати в базу
               </Link>
               <button onClick={handleReset} className="btn-secondary text-sm">
-                Спробувати інший текст
+                Інший текст
               </button>
             </div>
           </div>
-        </div>
-      )}
-
-      {/* ── How it works ── */}
-      {!analyzed && (
-        <div className="text-xs text-zinc-600">
-          Встав текст → AI витягне сутності → додай в базу
         </div>
       )}
     </div>
