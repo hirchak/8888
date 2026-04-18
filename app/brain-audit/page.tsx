@@ -145,18 +145,12 @@ export default function BrainAuditPage() {
 
   return (
     <div className="space-y-10">
-      {/* ── Hero ── */}
-      <div className="hero-gradient rounded-2xl p-8 md:p-12 text-center space-y-4">
-        <div className="inline-flex items-center gap-2 bg-cyan-500/10 border border-cyan-500/20 rounded-full px-4 py-1.5 text-sm text-cyan-400 mb-4">
-          <span>🧠</span>
-          <span>AI Brain Audit</span>
+      {/* ── Header ── */}
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h1 className="text-2xl font-bold text-white">Аналізатор</h1>
+          <p className="text-zinc-500 text-sm mt-1">Витягни сутності з тексту</p>
         </div>
-        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white leading-tight">
-          Аналізатор контексту
-        </h1>
-        <p className="text-zinc-400 text-lg max-w-2xl mx-auto">
-          Парсинг вхідних даних: витягує людей, проєкти, ідеї, можливості.
-        </p>
       </div>
 
       {/* ── Input Section ── */}
@@ -283,18 +277,8 @@ export default function BrainAuditPage() {
 
       {/* ── How it works ── */}
       {!analyzed && (
-        <div className="grid md:grid-cols-3 gap-4">
-          {[
-            { icon: '📋', title: 'Вставте текст', desc: 'Нотатки, листи, описи, записи' },
-            { icon: '🤖', title: 'AI аналізує', desc: 'Витягує людей, проєкти, ідеї, можливості' },
-            { icon: '💾', title: 'Збережіть в базу', desc: 'Додайте сутності до приватного Nexus' },
-          ].map((step, i) => (
-            <div key={i} className="cyber-card text-center space-y-2">
-              <div className="text-2xl">{step.icon}</div>
-              <div className="font-semibold text-zinc-200">{step.title}</div>
-              <div className="text-xs text-zinc-500">{step.desc}</div>
-            </div>
-          ))}
+        <div className="text-xs text-zinc-600">
+          Встав текст → AI витягне сутності → додай в базу
         </div>
       )}
     </div>
