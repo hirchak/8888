@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import Link from 'next/link';
 import { api } from '@/lib/api';
 
 const ENTITY_CONFIG = {
@@ -187,9 +186,6 @@ export default function BrainAuditPage() {
           <h1 className="text-2xl font-bold text-white">Аналізатор</h1>
           <p className="text-zinc-500 text-sm mt-1">Витягни сутності з тексту</p>
         </div>
-        <Link href="/voice" className="text-xs text-zinc-600 hover:text-cyan-400 transition-colors">
-          🎤 Голос →
-        </Link>
       </div>
 
       {/* Input */}
