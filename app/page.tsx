@@ -6,7 +6,7 @@ import { useSearchParams } from 'next/navigation';
 import { api } from '@/lib/api';
 import DashboardInsights from '@/components/DashboardInsights';
 import DeadCapital from '@/components/DeadCapital';
-import EmailCapturePopup from '@/components/EmailCapturePopup';
+import TeamHeader from '@/components/TeamHeader';
 import ProgressBar from '@/app/components/ProgressBar';
 import Badges, { type AchievementContext } from '@/app/components/Badges';
 
@@ -218,13 +218,8 @@ function DashboardInner() {
 
   return (
     <div className="space-y-10">
-      {/* Hero gradient bar */}
-      {!filtered && (
-        <div className="hero-gradient rounded-2xl p-6 mb-2">
-          <h1 className="text-xl sm:text-2xl font-bold text-white mb-1 leading-tight">AI Nexus Platform</h1>
-          <p className="text-zinc-400 text-sm">Ваш другий мозок для фаундерів</p>
-        </div>
-      )}
+      {/* Team Header */}
+      {!filtered && <TeamHeader />}
 
       {/* Search banner */}
       {filtered && (
@@ -438,11 +433,8 @@ function DashboardInner() {
 
 export default function DashboardPage() {
   return (
-    <>
-      <Suspense fallback={<div className="flex justify-center py-24"><div className="spinner" /></div>}>
-        <DashboardInner />
-      </Suspense>
-      <EmailCapturePopup />
-    </>
+    <Suspense fallback={<div className="flex justify-center py-24"><div className="spinner" /></div>}>
+      <DashboardInner />
+    </Suspense>
   );
 }

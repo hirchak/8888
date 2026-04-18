@@ -15,6 +15,18 @@ if (!g.nexusData) {
     nextId: { people: 1, projects: 1, ideas: 1, opportunities: 1, tasks: 1 },
     // Username index: username string (without @) -> person id
     usernameIndex: {},
+    // Team space config
+    teamConfig: {
+      mode: 'welcome', // 'welcome' | 'datetime' | 'team'
+      welcomeText: 'Вітаємо у просторі',
+      quote: 'Команда — це не люди які працюють разом. Команда — це люди які довіряють одне одному.',
+      quoteAuthor: 'Саймон Сінек',
+      city: 'Prague',
+      country: 'Czech Republic',
+      teamName: 'Hirchak & Pycha',
+      teamMotto: 'Від ідеї до справи',
+      teamLogo: '🌟',
+    },
   };
 }
 
