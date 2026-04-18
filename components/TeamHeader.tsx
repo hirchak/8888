@@ -161,7 +161,6 @@ export default function TeamHeader() {
   }, []);
 
   function handleSave(updated: any) {
-    // Optimistic update — switch immediately
     const prev = config;
     setConfig((c: any) => ({ ...c, ...updated }));
     setShowSettings(false);
@@ -173,6 +172,11 @@ export default function TeamHeader() {
       .then(r => r.json())
       .then(data => setConfig(data))
       .catch(() => { setConfig(prev); });
+  }
+
+  function switchTab(m: string) {
+    // Local-only switch — no API call
+    setConfig((c: any) => ({ ...c, mode: m }));
   }
 
   if (loading || !config) {
@@ -196,7 +200,7 @@ export default function TeamHeader() {
           {MODES.map(m => (
             <button
               key={m}
-              onClick={() => handleSave({ ...config, mode: m })}
+              onClick={() => switchTab(m)}
               className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-colors ${
                 config.mode === m
                   ? 'bg-cyan-600/30 text-cyan-300 border border-cyan-500/30'
