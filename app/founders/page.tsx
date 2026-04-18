@@ -118,17 +118,10 @@ export default function FoundersPage() {
         ))}
       </div>
 
-      {/* Bottom CTA */}
+      {/* Bottom CTA — внутрішній опис */}
       <div className="mt-10 text-center">
-        <p className="text-zinc-500 text-sm">
-          Хочеш приєднатися?{' '}
-          <a href="https://t.me/hirchak" className="text-cyan-400 hover:text-cyan-300 transition-colors underline underline-offset-2">
-            Напиши Юрію
-          </a>
-          {' '}або{' '}
-          <a href="https://t.me/andrisav" className="text-violet-400 hover:text-violet-300 transition-colors underline underline-offset-2">
-            Андрію
-          </a>
+        <p className="text-zinc-600 text-sm">
+          Внутрішній простір команди. Публічний доступ обмежений.
         </p>
       </div>
     </div>

@@ -152,10 +152,10 @@ export default function BrainAuditPage() {
           <span>AI Brain Audit</span>
         </div>
         <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white leading-tight">
-          Дізнайтеся, що ховається у вашому тексті
+          Аналізатор контексту
         </h1>
         <p className="text-zinc-400 text-lg max-w-2xl mx-auto">
-          Вставте будь-який текст — AI витягне всіх людей, ідеї, компанії. Без реєстрації.
+          Парсинг вхідних даних: витягує людей, проєкти, ідеї, можливості.
         </p>
       </div>
 
@@ -263,15 +263,15 @@ export default function BrainAuditPage() {
           {/* CTA to save */}
           <div className="hero-gradient rounded-2xl p-8 text-center space-y-4">
             <h3 className="text-xl font-bold text-white">
-              Зберегти ці результати у своєму Nexus?
+              Зберегти результати в Nexus?
             </h3>
             <p className="text-zinc-400 text-sm">
-              Створіть безкоштовний акаунт і додайте всі знайдені сутності одним кліком.
+              Додайте знайдені сутності до своєї бази.
             </p>
             <div className="flex flex-wrap items-center justify-center gap-3">
               <Link href="/add" className="btn-primary flex items-center gap-2">
                 <span>➕</span>
-                Створити безкоштовний акаунт
+                Додати в базу
               </Link>
               <button onClick={handleReset} className="btn-secondary text-sm">
                 Спробувати інший текст
@@ -285,9 +285,9 @@ export default function BrainAuditPage() {
       {!analyzed && (
         <div className="grid md:grid-cols-3 gap-4">
           {[
-            { icon: '📋', title: 'Вставте текст', desc: 'Скопіюйте нотатки, листи, описи — що завгодно' },
-            { icon: '🤖', title: 'AI аналізує', desc: 'Витягує людей, проєкти, ідеї та можливості' },
-            { icon: '💾', title: 'Збережіть результат', desc: 'Додайте знайдені сутності до свого Nexus' },
+            { icon: '📋', title: 'Вставте текст', desc: 'Нотатки, листи, описи, записи' },
+            { icon: '🤖', title: 'AI аналізує', desc: 'Витягує людей, проєкти, ідеї, можливості' },
+            { icon: '💾', title: 'Збережіть в базу', desc: 'Додайте сутності до приватного Nexus' },
           ].map((step, i) => (
             <div key={i} className="cyber-card text-center space-y-2">
               <div className="text-2xl">{step.icon}</div>
