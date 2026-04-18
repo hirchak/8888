@@ -55,6 +55,13 @@ export type Link = {
   target_type: 'person' | 'project' | 'idea' | 'opportunity';
 };
 
+export type Milestone = {
+  id: string;
+  title: string;
+  done: boolean;
+  completedAt: string | null;
+};
+
 export type Task = {
   id: number;
   title: string;

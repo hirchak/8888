@@ -28,8 +28,12 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
     if (idx === -1) return NextResponse.json({ detail: 'Project not found' }, { status: 404 });
 
     const proj = db.projects[idx];
-    for (const key of ['name', 'description', 'goal', 'stage', 'bottleneck', 'founder_id', 'tags', 'isPublic']) {
+    for (const key of ['name', 'description', 'goal', 'stage', 'bottleneck', 'founder_id', 'tags', 'isPublic', 'milestones']) {
       if (data[key] !== undefined) (proj as any)[key] = data[key];
+    }
+    // Auto-set completed_at when project is finished
+    if (data.stage === 'Paused' || data.stage === 'Launched') {
+      if (!proj.completed_at) proj.completed_at = new Date().toISOString();
     }
     proj.updated_at = new Date().toISOString();
 

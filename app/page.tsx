@@ -7,8 +7,8 @@ import { api } from '@/lib/api';
 import DashboardInsights from '@/components/DashboardInsights';
 import DeadCapital from '@/components/DeadCapital';
 import TeamHeader from '@/components/TeamHeader';
-import ProgressBar from '@/app/components/ProgressBar';
-import Badges, { type AchievementContext } from '@/app/components/Badges';
+import ProjectProgress from '@/components/ProjectProgress';
+import Achievements from '@/components/Achievements';
 
 const IDEA_STAGES = {
   'Hypothesis': { label: 'Гіпотеза', color: 'bg-amber-900/50 text-amber-300 border border-amber-800/40' },
@@ -249,29 +249,17 @@ function DashboardInner() {
       {/* Dashboard Insights */}
       {!filtered && <DashboardInsights />}
 
-      {/* Gamification: Progress Bar + Badges */}
-      {!filtered && stats && (
+      {/* Project Progress + Achievements */}
+      {!filtered && (
         <>
           <section>
             <h2 className="section-heading mb-4 flex items-center gap-2">
-              <span>🎮</span> <span className="gradient-text">Прогрес</span>
+              <span>🎯</span> <span className="gradient-text">Проєкти</span>
             </h2>
-            <div className="grid sm:grid-cols-2 gap-4">
-              <ProgressBar
-                entityCount={(stats.people ?? 0) + (stats.projects ?? 0) + (stats.ideas ?? 0) + (stats.opportunities ?? 0)}
-              />
-              <Badges
-                context={{
-                  totalEntities: (stats.people ?? 0) + (stats.projects ?? 0) + (stats.ideas ?? 0) + (stats.opportunities ?? 0),
-                  ideasCount: stats.ideas ?? 0,
-                  linksCount: 0,
-                  hasPublicEntity: (stats.people ?? 0) + (stats.projects ?? 0) + (stats.ideas ?? 0) + (stats.opportunities ?? 0) > 0,
-                  hasFirstEntity: (stats.people ?? 0) + (stats.projects ?? 0) + (stats.ideas ?? 0) + (stats.opportunities ?? 0) > 0,
-                  hasFirstLink: false,
-                }}
-              />
-            </div>
+            <ProjectProgress />
           </section>
+
+          <Achievements />
         </>
       )}
 

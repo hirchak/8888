@@ -57,6 +57,7 @@ export async function POST(req: NextRequest) {
       founder_id: data.founder_id ?? null,
       tags: data.tags || '',
       isPublic: data.isPublic === true,
+      milestones: data.milestones || [],
       created_at: now,
       updated_at: now,
     };
