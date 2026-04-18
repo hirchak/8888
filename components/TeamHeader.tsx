@@ -161,14 +161,18 @@ export default function TeamHeader() {
   }, []);
 
   function handleSave(updated: any) {
+    // Optimistic update — switch immediately
+    const prev = config;
+    setConfig((c: any) => ({ ...c, ...updated }));
+    setShowSettings(false);
     fetch('/api/team-config', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(updated),
     })
       .then(r => r.json())
-      .then(data => { setConfig(data); setShowSettings(false); })
-      .catch(console.error);
+      .then(data => setConfig(data))
+      .catch(() => { setConfig(prev); });
   }
 
   if (loading || !config) {
