@@ -21,6 +21,9 @@ interface Project {
 const TIME_FILTERS = [
   { key: 'week', label: 'Тиждень' },
   { key: 'month', label: 'Місяць' },
+  { key: 'halfyear', label: 'Пів року' },
+  { key: 'year', label: 'Рік' },
+  { key: '5years', label: '5 років' },
   { key: 'all', label: 'Всі' },
 ];
 
@@ -37,6 +40,18 @@ function isWithinPeriod(dateStr: string | null | undefined, period: string): boo
   if (period === 'month') {
     const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
     return date >= monthAgo;
+  }
+  if (period === 'halfyear') {
+    const halfyearAgo = new Date(now.getTime() - 183 * 24 * 60 * 60 * 1000);
+    return date >= halfyearAgo;
+  }
+  if (period === 'year') {
+    const yearAgo = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000);
+    return date >= yearAgo;
+  }
+  if (period === '5years') {
+    const fiveYearsAgo = new Date(now.getTime() - 1825 * 24 * 60 * 60 * 1000);
+    return date >= fiveYearsAgo;
   }
   return true;
 }
