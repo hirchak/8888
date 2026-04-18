@@ -105,12 +105,6 @@ function FounderCard({ founder, index }) {
 export default function FoundersPage() {
   return (
     <div className="max-w-5xl mx-auto">
-      {/* Hero */}
-      <div className="hero-gradient rounded-2xl p-8 mb-10 text-center">
-        <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2 leading-tight">Команда AI Nexus</h1>
-        <p className="text-zinc-400 text-sm">Два фаундери, одна місія — будувати етичну AI-екосистему</p>
-      </div>
-
       {/* Cards grid — sticky on desktop */}
       <div className="grid md:grid-cols-2 gap-6 lg:sticky lg:top-6">
         {FOUNDERS.map((founder, i) => (
@@ -118,12 +112,6 @@ export default function FoundersPage() {
         ))}
       </div>
 
-      {/* Bottom CTA — внутрішній опис */}
-      <div className="mt-10 text-center">
-        <p className="text-zinc-600 text-sm">
-          Внутрішній простір команди. Публічний доступ обмежений.
-        </p>
-      </div>
     </div>
   );
 }
