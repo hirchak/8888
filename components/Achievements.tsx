@@ -18,13 +18,9 @@ interface Project {
   completed_at?: string;
 }
 
-const TIME_FILTERS = [
-  { key: 'week', label: 'Тиждень' },
-  { key: 'month', label: 'Місяць' },
-  { key: 'halfyear', label: 'Пів року' },
-  { key: 'year', label: 'Рік' },
-  { key: '5years', label: '5 років' },
-  { key: 'all', label: 'Всі' },
+const ACHIEVEMENT_FILTERS = [
+  { key: 'projects', label: 'Завершені Проєкти' },
+  { key: 'tasks', label: 'Завершені Задачі' },
 ];
 
 function isWithinPeriod(dateStr: string | null | undefined, period: string): boolean {
@@ -107,11 +103,13 @@ export default function Achievements() {
   }, [projects]);
 
   const filteredMilestones = useMemo(() => {
-    return completedMilestones.filter(({ milestone }) => isWithinPeriod(milestone.completedAt, filter));
+    if (filter === 'projects') return [];
+    return completedMilestones;
   }, [completedMilestones, filter]);
 
   const filteredProjects = useMemo(() => {
-    return completedProjects.filter((p: Project) => isWithinPeriod(p.completed_at, filter));
+    if (filter === 'tasks') return [];
+    return completedProjects;
   }, [completedProjects, filter]);
 
   const totalCount = filteredMilestones.length + filteredProjects.length;
@@ -134,7 +132,7 @@ export default function Achievements() {
           )}
         </div>
         <div className="flex gap-1">
-          {TIME_FILTERS.map(f => (
+          {ACHIEVEMENT_FILTERS.map(f => (
             <button
               key={f.key}
               onClick={() => setFilter(f.key)}

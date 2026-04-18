@@ -20,7 +20,11 @@ const ENTITY_TYPE_LABELS = {
 const FILTER_TABS = [
   { key: 'all', label: 'Всі' },
   { key: 'today', label: 'Сьогодні' },
-  { key: 'week', label: 'Цей тиждень' },
+  { key: 'week', label: 'Тиждень' },
+  { key: 'month', label: 'Місяць' },
+  { key: 'halfyear', label: 'Пів року' },
+  { key: 'year', label: 'Рік' },
+  { key: '5years', label: '5 років' },
   { key: 'overdue', label: 'Прострочені' },
 ];
 
@@ -487,6 +491,34 @@ export default function TasksPage() {
       const due = new Date(task.dueDate).getTime();
       const week = 7 * 24 * 60 * 60 * 1000;
       return due >= now && due <= now + week;
+    }
+    if (filter === 'month') {
+      if (!task.dueDate || task.status === 'done') return false;
+      const now = Date.now();
+      const due = new Date(task.dueDate).getTime();
+      const month = 30 * 24 * 60 * 60 * 1000;
+      return due >= now && due <= now + month;
+    }
+    if (filter === 'halfyear') {
+      if (!task.dueDate || task.status === 'done') return false;
+      const now = Date.now();
+      const due = new Date(task.dueDate).getTime();
+      const halfyear = 183 * 24 * 60 * 60 * 1000;
+      return due >= now && due <= now + halfyear;
+    }
+    if (filter === 'year') {
+      if (!task.dueDate || task.status === 'done') return false;
+      const now = Date.now();
+      const due = new Date(task.dueDate).getTime();
+      const year = 365 * 24 * 60 * 60 * 1000;
+      return due >= now && due <= now + year;
+    }
+    if (filter === '5years') {
+      if (!task.dueDate || task.status === 'done') return false;
+      const now = Date.now();
+      const due = new Date(task.dueDate).getTime();
+      const fiveyears = 1825 * 24 * 60 * 60 * 1000;
+      return due >= now && due <= now + fiveyears;
     }
     return true;
   });
