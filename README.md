@@ -1,71 +1,36 @@
-# AI Nexus Platform
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-> "Другий мозок" для візіонерів. Інтелектуальна платформа для управління знаннями та зв'язками між Людьми, Проєктами, Ідеями та Можливостями.
+## Getting Started
 
-## 🏗 Архітектура (MVP)
+First, run the development server:
 
-```
-ai-nexus-platform/
-├── backend/            # FastAPI + SQLite
-│   ├── main.py         # FastAPI app entry
-│   ├── database.py     # SQLite setup + init
-│   ├── schemas.py      # Pydantic models
-│   └── routers/
-│       └── entities.py # All API endpoints
-├── frontend/           # React + Vite + Tailwind CSS
-│   └── src/
-│       ├── pages/      # Dashboard, Person/Project/Idea/Opportunity cards, AddEntity
-│       └── components/ # Layout
-└── README.md
-```
-
-## 🚀 Запуск
-
-### Backend
 ```bash
-cd backend
-pip install -r requirements.txt
-uvicorn main:app --reload --port 8000
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
 ```
 
-### Frontend
-```bash
-cd frontend
-npm install
-npm run dev        # Development
-npm run build      # Production build
-```
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-**Vercel (frontend):** `vercel --prod` з кореня `frontend/`
-**Railway (backend):** Підключіть Railway до папки `backend/` з командою `uvicorn main:app --host 0.0.0.0 --port $PORT`
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-## 📡 API Endpoints
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/stats` | Dashboard stats |
-| GET/POST | `/api/people` | List / create people |
-| GET/PUT/DELETE | `/api/people/{id}` | Read / update / delete person |
-| GET/POST | `/api/projects` | List / create projects |
-| GET/PUT/DELETE | `/api/projects/{id}` | Read / update / delete project |
-| GET/POST | `/api/ideas` | List / create ideas |
-| GET/PUT/DELETE | `/api/ideas/{id}` | Read / update / delete idea |
-| GET/POST | `/api/opportunities` | List / create opportunities |
-| GET/PUT/DELETE | `/api/opportunities/{id}` | Read / update / delete opportunity |
-| POST/DELETE | `/api/links` | Bi-directional links |
-| GET/POST | `/api/leads` | Email capture leads (local `/data/leads.json`) |
+## Learn More
 
-## 🧩 Сутності
+To learn more about Next.js, take a look at the following resources:
 
-- **👤 Людина** — контакти, експертиза, історія комунікацій
-- **🚀 Проєкт** — активні ініціативи (цілі, етапи, bottleneck)
-- **💡 Ідея** — гіпотези та концепти з пайплайном статусів
-- **🧩 Можливість** — активи, ресурси, таланти, знижки
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
-## 🔗 Bi-directional Linking
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-Всі сутності підтримують двосторонні зв'язки:
-- Людина ↔ Проєкт
-- Людина ↔ Ідея
-- Ідея ↔ Можливість
-- Проєкт ↔ Можливість
+## Deploy on Vercel
+
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
