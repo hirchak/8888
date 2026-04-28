@@ -18,7 +18,7 @@ const PROJECT_STAGES = ['Planning', 'MVP', 'Beta', 'Active', 'Paused'];
 const OPP_CATEGORIES = ['#Інструмент', '#Фінанси', '#Зв\'язки', '#Експертиза', '#Капітал', '#Партнерство'];
 const SOURCE_TYPES = [['external', 'Від партнера'], ['own_project', 'Внутрішній ресурс']];
 
-function Field({ label, value, onChange, type = 'text', placeholder, required = false }) {
+function Field({ label, value, onChange, type = 'text', placeholder, required = false }: { label: string; value: string; onChange: (v: string) => void; type?: string; placeholder?: string; required?: boolean }) {
   return (
     <div>
       <label className="label">{label}{required && <span className="text-red-400 ml-0.5">*</span>}</label>
@@ -76,7 +76,7 @@ function SampleDataBanner() {
       setDone(true);
       setTimeout(() => router.push('/'), 2000);
     } catch(e) {
-      alert('Помилка: ' + e.message);
+      alert('Помилка: ' + String(e));
     } finally {
       setLoading(false);
     }
@@ -176,7 +176,7 @@ function QuickAddForm() {
       setRaw('');
       setParsed([]);
     } catch (e) {
-      alert(e.message);
+      alert(String(e));
     } finally {
       setSaving(false);
     }
@@ -260,7 +260,7 @@ function AddForm() {
   const [idea, setIdea] = useState({ name: '', pitch: '', roi: '', origin: '', author: '', requirements: '', matched_assets: '', status: 'Hypothesis', tags: '', isPublic: false });
   const [opp, setOpp] = useState({ name: '', description: '', category: '', source_type: 'external', tags: '', isPublic: false });
 
-  async function handleSubmit(e) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true);
     setError('');
@@ -285,7 +285,7 @@ function AddForm() {
         router.push(`/opportunities/${created.id}`);
       }
     } catch (e) {
-      setError(e.message);
+      setError(String(e));
     } finally {
       setSaving(false);
     }

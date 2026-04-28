@@ -18,9 +18,9 @@ export async function GET(req: NextRequest) {
       );
     }
     if (tagsParam) {
-      const filterTags = tagsParam.split(',').map(t => t.trim().toLowerCase());
+      const filterTags = tagsParam.split(',').map((t: string) => t.trim().toLowerCase());
       ideas = ideas.filter((i: any) => {
-        const entityTags = (i.tags || '').split(',').map(t => t.trim().toLowerCase()).filter(Boolean);
+        const entityTags = (i.tags || '').split(',').map((t: string) => t.trim().toLowerCase()).filter(Boolean);
         return filterTags.some(ft => entityTags.includes(ft));
       });
     }

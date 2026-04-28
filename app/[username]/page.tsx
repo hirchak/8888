@@ -33,9 +33,11 @@ const ENTITY_CONFIG = {
     borderColor: 'border-violet-800/30',
     tagBg: 'bg-violet-900/50 text-violet-300 border-violet-800/40',
   },
-};
+} as const;
 
-function TagList({ tags }: { tags: string }) {
+type EntityType = keyof typeof ENTITY_CONFIG;
+
+function TagList({ tags }: { tags?: string }) {
   if (!tags) return null;
   return (
     <div className="flex flex-wrap gap-1.5 mt-2">
@@ -52,8 +54,8 @@ function TagList({ tags }: { tags: string }) {
   );
 }
 
-function EntityCard({ entity }: { entity: any }) {
-  const config = ENTITY_CONFIG[entity.type] || ENTITY_CONFIG.person;
+function EntityCard({ entity }: { entity: { type?: EntityType; name?: string; role?: string; description?: string; pitch?: string; expertise?: string; stage?: string; status?: string; category?: string; tags?: string } }) {
+  const config = entity.type ? ENTITY_CONFIG[entity.type]! : ENTITY_CONFIG.person;
   return (
     <div
       className={`cyber-card group bg-gradient-to-br ${config.gradient} border ${config.borderColor}`}
